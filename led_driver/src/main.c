@@ -7,6 +7,7 @@
 #include "../library/led_display.h"
 #include "../library/gpio.h"
 #include "../library/timer.h"
+#include "../library/dma.h"
 
 void usleep(int microseconds)
 {
@@ -119,6 +120,9 @@ int main(void)
 	
 	timer_enable(TIMER_0_CGC);
 	timer_periodic_enable(TIMER0);
+	
+	dma_enable();
+	dma_test();
 	
 	do_led_stuff();
 }
