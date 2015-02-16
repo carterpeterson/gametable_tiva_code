@@ -1,8 +1,3 @@
-// C
-
-// MCU
-
-// Project
 #include "timer.h"
 
 bool timer_enable(uint8_t timers)

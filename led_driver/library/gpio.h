@@ -3,6 +3,9 @@
 
 // C
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 // MCU
 #include "TM4C123.h"
@@ -118,5 +121,17 @@ bool gpio_analog_disable(GPIOA_Type *port, uint8_t pins);
 *		True if port direction was changed
 */
 bool gpio_pin_direction(GPIOA_Type *port, uint8_t direction, uint8_t pins);
+
+/*
+*	Enable the alternate function of the specified pins
+*	
+*	Parameters:
+*		base_addr - Base address of the GPIO port
+*		pins - Pins to be have direction changed
+*			
+*	Returns:
+*		True if port direction was changed
+*/
+bool gpio_alternate_function_enable(GPIOA_Type *port, uint8_t pins);
 
 #endif

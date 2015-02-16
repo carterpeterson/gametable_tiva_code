@@ -4,10 +4,13 @@
 #include <stdbool.h>
 
 #include "TM4C123.h"
+#include "system_TM4C123.h"
+
 #include "../library/led_display.h"
 #include "../library/gpio.h"
 #include "../library/timer.h"
 #include "../library/dma.h"
+#include "../library/uart.h"
 
 void usleep(int microseconds)
 {
@@ -113,16 +116,22 @@ void do_led_stuff(void)
 }
 
 int main(void)
-{	
+{
 	gpio_port_enable(PORT_A_CGC);
-	gpio_digital_enable(PORT_A, PIN_2);
-	gpio_pin_direction(PORT_A, DIRECTION_OUTPUT, PIN_2);
+	gpio_digital_enable(PORT_A, (PIN_0 | PIN_1 | PIN_2));
+	gpio_pin_direction(PORT_A, DIRECTION_OUTPUT, (PIN_0 | PIN_1 | PIN_2));
+	gpio_alternate_function_enable(PORT_A, (PIN_0 | PIN_1));
+	PORT_A->PCTL = 0x0011;
 	
 	timer_enable(TIMER_0_CGC);
 	timer_periodic_enable(TIMER0);
 	
-	dma_enable();
-	dma_test();
+	uart_enable(UART0_CGC);
+	uart_configure(UART0, 115200);
+
+	while(1) {
+		UART0->DR = 'a';
+	}
 	
-	do_led_stuff();
+	//do_led_stuff();
 }

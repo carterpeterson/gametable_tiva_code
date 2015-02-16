@@ -424,19 +424,19 @@
           <GroupName>library</GroupName>
           <Files>
             <File>
-              <FileName>i2c.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\library\i2c.c</FilePath>
-            </File>
-            <File>
-              <FileName>i2c.h</FileName>
+              <FileName>config.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\library\i2c.h</FilePath>
+              <FilePath>.\library\config.h</FilePath>
             </File>
             <File>
-              <FileName>gpio.c</FileName>
+              <FileName>dma.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\library\dma.h</FilePath>
+            </File>
+            <File>
+              <FileName>dma.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\library\gpio.c</FilePath>
+              <FilePath>.\library\dma.c</FilePath>
             </File>
             <File>
               <FileName>gpio.h</FileName>
@@ -444,14 +444,19 @@
               <FilePath>.\library\gpio.h</FilePath>
             </File>
             <File>
-              <FileName>config.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\library\config.h</FilePath>
+              <FileName>gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\library\gpio.c</FilePath>
             </File>
             <File>
-              <FileName>led_display.c</FileName>
+              <FileName>i2c.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\library\i2c.h</FilePath>
+            </File>
+            <File>
+              <FileName>i2c.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\library\led_display.c</FilePath>
+              <FilePath>.\library\i2c.c</FilePath>
             </File>
             <File>
               <FileName>led_display.h</FileName>
@@ -459,14 +464,29 @@
               <FilePath>.\library\led_display.h</FilePath>
             </File>
             <File>
+              <FileName>led_display.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\library\led_display.c</FilePath>
+            </File>
+            <File>
+              <FileName>timer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\library\timer.h</FilePath>
+            </File>
+            <File>
               <FileName>timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\library\timer.c</FilePath>
             </File>
             <File>
-              <FileName>dma.c</FileName>
+              <FileName>uart.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\library\uart.h</FilePath>
+            </File>
+            <File>
+              <FileName>uart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\library\dma.c</FilePath>
+              <FilePath>.\library\uart.c</FilePath>
             </File>
           </Files>
         </Group>

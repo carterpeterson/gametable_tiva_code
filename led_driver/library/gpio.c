@@ -1,10 +1,3 @@
-// C
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
-
-// Project
 #include "gpio.h"
 
 bool gpio_port_enable(uint8_t ports)
@@ -65,4 +58,11 @@ bool gpio_pin_direction(GPIOA_Type *port, uint8_t direction, uint8_t pins)
 	}
 	
 	return false;
+}
+
+bool gpio_alternate_function_enable(GPIOA_Type *port, uint8_t pins)
+{
+	port->AFSEL |= pins;
+	
+	return true;
 }
