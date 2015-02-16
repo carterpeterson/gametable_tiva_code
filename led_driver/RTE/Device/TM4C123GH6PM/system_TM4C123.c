@@ -548,13 +548,18 @@ void SystemCoreClockUpdate (void)            /* Get Core Clock Frequency      */
       } else {
         SystemCoreClock = PLL_CLK;
       }
-      if (rcc & (1UL<<22)) {                            /* check USESYSDIV */
-        if (rcc2 & (1UL<<11)) {
-          SystemCoreClock = SystemCoreClock / (((rcc2>>23) & (0x3F)) + 1);
-        } else {
-          SystemCoreClock = SystemCoreClock / (((rcc2>>23) & (0x3F)) + 1) / 2;
-        }
-      }
+      if (rcc & (1UL<<22)) {                            /* check USESYSDIV */										
+			if (rcc2 & (1UL<<11)) {						/* check BYPASS */
+				
+					SystemCoreClock = SystemCoreClock / (((rcc2>>23) & (0x3F)) + 1);
+			} else {
+				if(rcc2 & (1UL<<30)){					/* check DIV400 */		
+					SystemCoreClock = SystemCoreClock / (((rcc2>>22) & (0x7F)) + 1);
+				} else {
+					SystemCoreClock = SystemCoreClock / (((rcc2>>23) & (0x3F)) + 1) / 2;
+				}
+			}
+		}
     } else {
   //    if (RCC_Val & (1UL<<11)) {                            /* check BYPASS */
       if (rcc & (1UL<<11)) {                            /* check BYPASS */ /* Simulation does not work at this point */

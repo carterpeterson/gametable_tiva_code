@@ -116,7 +116,7 @@ void do_led_stuff(void)
 }
 
 int main(void)
-{
+{	
 	gpio_port_enable(PORT_A_CGC);
 	gpio_digital_enable(PORT_A, (PIN_0 | PIN_1 | PIN_2));
 	gpio_pin_direction(PORT_A, DIRECTION_OUTPUT, (PIN_0 | PIN_1 | PIN_2));
@@ -125,6 +125,9 @@ int main(void)
 	
 	timer_enable(TIMER_0_CGC);
 	timer_periodic_enable(TIMER0);
+	
+	//dma_enable();
+	//dma_test();
 	
 	uart_enable(UART0_CGC);
 	uart_configure(UART0, 115200);
