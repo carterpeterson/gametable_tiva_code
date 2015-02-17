@@ -115,6 +115,7 @@ void do_led_stuff(void)
 	}
 }
 
+
 int main(void)
 {	
 	gpio_port_enable(PORT_A_CGC);
@@ -130,10 +131,10 @@ int main(void)
 	//dma_test();
 	
 	uart_enable(UART0_CGC);
-	uart_configure(UART0, 115200);
+	uart_configure(UART0, 1000000);
 
 	while(1) {
-		UART0->DR = 'a';
+		printf("test\n");
 	}
 	
 	//do_led_stuff();

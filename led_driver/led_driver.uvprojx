@@ -459,6 +459,16 @@
               <FilePath>.\library\i2c.c</FilePath>
             </File>
             <File>
+              <FileName>interrupt.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\library\interrupt.h</FilePath>
+            </File>
+            <File>
+              <FileName>interrupt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\library\interrupt.c</FilePath>
+            </File>
+            <File>
               <FileName>led_display.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\library\led_display.h</FilePath>
@@ -467,6 +477,16 @@
               <FileName>led_display.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\library\led_display.c</FilePath>
+            </File>
+            <File>
+              <FileName>pc_buffer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\library\pc_buffer.h</FilePath>
+            </File>
+            <File>
+              <FileName>pc_buffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\library\pc_buffer.c</FilePath>
             </File>
             <File>
               <FileName>timer.h</FileName>
