@@ -124,8 +124,8 @@ int main(void)
 	gpio_alternate_function_enable(PORT_A, (PIN_0 | PIN_1));
 	PORT_A->PCTL = 0x0011;
 	
-	timer_enable(TIMER_0_CGC);
-	timer_periodic_enable(TIMER0);
+	//timer_init(TIMER0);
+	//timer_periodic_enable(TIMER0);
 	
 	uart_enable(UART0_CGC);
 	uart_configure(UART0, 500000);

@@ -43,5 +43,8 @@ void dma_test(void)
 	UDMA->ENASET |= (0x01 << 30);
 	UDMA->SWREQ |= (0x01 << 30);
 	
+	for(; i < 1000; i++)
+		; // Wait
+	
 	printf("dest[0]: %d\n", dest[0]);
 }

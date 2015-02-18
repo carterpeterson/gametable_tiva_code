@@ -18,10 +18,10 @@
 *			The address increment value must be equal or greater than
 *			the value of the destination size (DSTSIZE).
 */
-#define DMA_DSTINC_BYTE (0x0 << 30) // Increment by 8-bit locations
-#define DMA_DSTINC_HALF	(0x1 <<	30)	// Increment by 16-bit locations
-#define DMA_DSTINC_WORD (0x2 <<	30)	// Increment by 32-bit locations
-#define DMA_DSTINC_NONE (0x3 <<	30)	// Do not increment
+#define DMA_DSTINC_BYTE (0x0U << 30) // Increment by 8-bit locations
+#define DMA_DSTINC_HALF	(0x1U <<	30)	// Increment by 16-bit locations
+#define DMA_DSTINC_WORD (0x2U <<	30)	// Increment by 32-bit locations
+#define DMA_DSTINC_NONE (0x3U <<	30)	// Do not increment
 
 
 /*
