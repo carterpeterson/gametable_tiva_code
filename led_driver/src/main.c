@@ -127,15 +127,14 @@ int main(void)
 	timer_enable(TIMER_0_CGC);
 	timer_periodic_enable(TIMER0);
 	
-	//dma_enable();
-	//dma_test();
-	
 	uart_enable(UART0_CGC);
-	uart_configure(UART0, 1000000);
-
-	while(1) {
-		printf("test\n");
-	}
+	uart_configure(UART0, 500000);
+	
+	dma_enable();
+	dma_test();
+	
+	while(1)
+		; // Don't exit
 	
 	//do_led_stuff();
 }
