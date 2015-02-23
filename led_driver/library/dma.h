@@ -12,13 +12,27 @@
 // DMA related defines
 
 /*
+*	DMA Channel Priority, whether or not the channel will be high
+*	priority or default priority
+*/
+#define DMA_PRIORITY_DEFAULT	0
+#define DMA_PRIORITY_HIGH		1
+
+/*
+*	DMA Useburst, determines whether the DMA channel will respond
+*	to single requests in addition to burst requests.
+*/
+#define DMA_USE_BURST_AND_SINGLE	0
+#define DMA_USE_BURST_ONLY			1
+
+/*
 *		Destination address increment:
 *			This field configures the destination address increment.
 *
 *			The address increment value must be equal or greater than
 *			the value of the destination size (DSTSIZE).
 */
-#define DMA_DSTINC_BYTE (0x0U << 30) // Increment by 8-bit locations
+#define DMA_DSTINC_BYTE (0x0U << 	30) // Increment by 8-bit locations
 #define DMA_DSTINC_HALF	(0x1U <<	30)	// Increment by 16-bit locations
 #define DMA_DSTINC_WORD (0x2U <<	30)	// Increment by 32-bit locations
 #define DMA_DSTINC_NONE (0x3U <<	30)	// Do not increment

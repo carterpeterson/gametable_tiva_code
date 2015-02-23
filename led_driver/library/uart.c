@@ -38,10 +38,10 @@ void uart_configure(UART0_Type *uart, uint32_t baud_rate)
     UART0->IM = UART_IM_TXIM;
     
     // Set the priority to 1
-    NVIC_SetPriority(UART0_IRQn, 1);
+    //NVIC_SetPriority(UART0_IRQn, 1);
   
     // Enable the NVIC
-    NVIC_EnableIRQ(UART0_IRQn);
+    //NVIC_EnableIRQ(UART0_IRQn);
     
     // Initialize the circular buffer
     pc_buffer_init(&UART0_Tx_Buffer,UART0_Tx_Buffer_Array, UART0_BUFFER_SIZE); 
