@@ -28,7 +28,7 @@ pushBuffer PROC
 	MOV		R2, #HIGH
 	
 	MOV32	R4, PORTF
-	MOV 	R3, #5
+	MOV 	R3, #2
 	MOV		R5, #0
 
 	; Save a copy of color array address

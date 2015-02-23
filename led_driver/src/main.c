@@ -13,7 +13,9 @@
 #include "../library/uart.h"
 
 
-uint8_t buffer[6];
+Pixel *display_buffer;
+Pixel buffer_one[2];
+Pixel buffer_two[2];
 
 void usleep(int microseconds)
 {
@@ -33,7 +35,7 @@ void dma_test(void)
 	dma_use_burst(30, DMA_USE_BURST_AND_SINGLE);
 	dma_peripheral_request_mask_set(30, DMA_REQ_MASK_PERIPHERAL);
 	
-	test_uart_tx_req.source = &buffer[5];	
+	test_uart_tx_req.source = &(buffer_one[1].blue);	
 	test_uart_tx_req.destination = (void*) &(UART0->DR);
 	test_uart_tx_req.control = (DMA_DSTINC_NONE | \
 	DMA_DSTSIZE_BYTE | DMA_SRCINC_BYTE | DMA_SRCSIZE_BYTE | \
@@ -50,7 +52,7 @@ void dma_test(void)
 	UDMA->CHMAP1 &= ~(0x0F);
 	
 	test_uart_rx_req.source = (void*) &(UART0->DR);
-	test_uart_rx_req.destination = &buffer[5];
+	test_uart_rx_req.destination = &(buffer_one[1].blue);
 	test_uart_rx_req.control = (DMA_DSTINC_BYTE | \
 	DMA_DSTSIZE_BYTE | DMA_SRCINC_NONE | DMA_SRCSIZE_BYTE | \
 	DMA_ARBSIZE_4 | (5U << 4) | DMA_XFERMODE_BASIC);
@@ -146,13 +148,9 @@ void do_led_stuff(void)
 		frame_buffer[4].red = red[2];
 		frame_buffer[4].green = green[2];
 		frame_buffer[4].blue = blue[2];*/
-		
-		
-		while((TIMER0->RIS & 0x1) != 0x1) {
-			; // Do nothing
-		}
-		TIMER0->ICR = 0x01;
+
 		pushBuffer(frame_buffer);
+		
 	}
 }
 
@@ -173,8 +171,11 @@ int main(void)
 	
 	dma_test();
 	
-	while(1)
-		; // Don't exit
+	display_buffer = buffer_two;
 	
-	//do_led_stuff();
+	while(1) {
+		pushBuffer(display_buffer);
+		usleep(0);
+	}
+	
 }

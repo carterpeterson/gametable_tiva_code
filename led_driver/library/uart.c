@@ -26,12 +26,6 @@ void uart_configure(UART0_Type *uart, uint32_t baud_rate)
     UART0->LCRH = UART_CTL_WORD_LENGTH_8 | UART_LCRH_FEN;
 
 	UART0->DMACTL |= 0x01;	// Enable Receive DMA
-
-    // Configure the FIFO Interrupt Levels
-    //UART0->IFLS = UART_IFLS_TX1_8;
-    
-    // Turn on the UART Interrupts  for Tx, Rx, and Rx Timeout
-    //UART0->IM = UART_IM_TXIM;
     
     // Set the priority to 1
     NVIC_SetPriority(UART0_IRQn, 1);

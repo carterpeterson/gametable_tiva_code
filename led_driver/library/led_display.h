@@ -7,4 +7,8 @@ typedef struct {
 
 extern void pushBuffer(Pixel *i);
 
+extern Pixel *display_buffer;
+extern Pixel buffer_one[2];
+extern Pixel buffer_two[2];
+
 #endif
