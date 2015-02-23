@@ -10,9 +10,7 @@
 // Project
 #include "pc_buffer.h"
 #include "uart.h"
-
-#define UART_MIS_TXMIS          0x00000020  // UART Transmit Masked Interrupt
-                                            // Status
+#include "dma.h"
 
 void DisableInterrupts(void);
 void EnableInterrupts(void);

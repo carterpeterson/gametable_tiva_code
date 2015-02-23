@@ -3,9 +3,6 @@
 
 __align(1024) DMA_control dma_control_structure[64];
 
-	uint8_t source[16];
-	uint8_t dest[16];
-
 bool dma_enable(void)
 {
 	SYSCTL->RCGCDMA = 0x1;
@@ -19,7 +16,37 @@ bool dma_enable(void)
 	return true;
 }
 
-bool dma_set_primary_control_structure(uint8_t channel, DMA_control *control)
+bool dma_channel_enable(uint8_t channel)
+{
+	if(channel > 31)
+		return false;
+
+	UDMA->ENASET |= (0x01 << channel);
+	
+	return true;
+}
+
+bool dma_channel_disable(uint8_t channel)
+{
+	if(channel > 31)
+		return false;
+
+	UDMA->ENACLR |= (0x01 << channel);
+	
+	return true;
+}
+
+bool dma_channel_request(uint8_t channel)
+{
+	if(channel > 31)
+		return false;
+
+	UDMA->SWREQ |= (0x01 << channel);
+	
+	return true;
+}
+
+bool dma_primary_control_structure_set(uint8_t channel, DMA_control *control)
 {
 	if(channel > 31)
 		return false;
@@ -31,7 +58,7 @@ bool dma_set_primary_control_structure(uint8_t channel, DMA_control *control)
 	return true;
 }
 
-bool dma_set_secondary_control_structure(uint8_t channel, DMA_control *control)
+bool dma_secondary_control_structure_set(uint8_t channel, DMA_control *control)
 {
 	if(channel > 31)
 		return false;
@@ -43,7 +70,7 @@ bool dma_set_secondary_control_structure(uint8_t channel, DMA_control *control)
 	return true;
 }
 
-bool dma_set_priority(uint8_t channel, uint8_t priority)
+bool dma_priority_set(uint8_t channel, uint8_t priority)
 {
 	if(channel > 31)
 		return false;
@@ -103,34 +130,22 @@ bool dma_use_burst(uint8_t channel, uint8_t use_burst)
 	return true;
 }
 
-void dma_test(void)
+bool dma_peripheral_request_mask_set(uint8_t channel, uint8_t mask)
 {
-	int i = 0;
+	if(channel > 31)
+		return false;
 	
-	source[0] = 't';
-	source[1] = 'e';
-	source[2] = 's';
-	source[3] = 't';
-	source[4] = '\n';
-	source[5] = '\r';
+	switch(mask){
+	case DMA_REQ_MASK_PERIPHERAL:
+		UDMA->REQMASKCLR |= (0x01 << channel);
+		break;
+	case DMA_REQ_MASK_SOFTWARE_ONLY:
+		UDMA->REQMASKSET |= (0x01 << channel);
+		break;
+	default:
+		// Do nothing
+		break;
+	}
 	
-	dma_set_priority(30, DMA_PRIORITY_DEFAULT);
-	dma_use_primary_control(30);
-	dma_use_burst(30, DMA_USE_BURST_AND_SINGLE);
-	
-	UDMA->REQMASKCLR  |= (0x01 << 30);
-	
-	dma_control_structure[30].source = &source[5];
-	dma_control_structure[30].destination = (void*) &(UART0->DR);//&dest[16];
-	dma_control_structure[30].control = (DMA_DSTINC_NONE | \
-	DMA_DSTSIZE_BYTE | DMA_SRCINC_BYTE | DMA_SRCSIZE_BYTE | \
-	DMA_ARBSIZE_1 | (6U << 4) | DMA_XFERMODE_AUTO_REQUEST);
-	
-	UDMA->ENASET |= (0x01 << 30);
-	UDMA->SWREQ |= (0x01 << 30);
-	
-	for(; i < 1000; i++)
-		; // Wait
-	
-	printf("done\n");
+	return 0;
 }

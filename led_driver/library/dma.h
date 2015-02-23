@@ -12,18 +12,25 @@
 // DMA related defines
 
 /*
-*	DMA Channel Priority, whether or not the channel will be high
-*	priority or default priority
+*		DMA Channel Priority, whether or not the channel will be high
+*		priority or default priority
 */
 #define DMA_PRIORITY_DEFAULT	0
 #define DMA_PRIORITY_HIGH		1
 
 /*
-*	DMA Useburst, determines whether the DMA channel will respond
-*	to single requests in addition to burst requests.
+*		DMA Useburst, determines whether the DMA channel will respond
+*		to single requests in addition to burst requests.
 */
 #define DMA_USE_BURST_AND_SINGLE	0
 #define DMA_USE_BURST_ONLY			1
+
+/*
+*		DMA Request Mask, determines whether the peripherals associated
+*		with the DMA channel are able to request DMA transfers
+*/
+#define DMA_REQ_MASK_PERIPHERAL		0
+#define DMA_REQ_MASK_SOFTWARE_ONLY	1		
 
 /*
 *		Destination address increment:
@@ -132,7 +139,20 @@ typedef struct {
 
 extern DMA_control dma_control_structure[64];
 
+/*
+*	Function Declerations
+*/
+
 bool dma_enable(void);
-void dma_test(void);
+bool dma_channel_enable(uint8_t channel);
+bool dma_channel_disable(uint8_t channel);
+bool dma_channel_request(uint8_t channel);
+bool dma_primary_control_structure_set(uint8_t channel, DMA_control *control);
+bool dma_secondary_control_structure_set(uint8_t channel, DMA_control *control);
+bool dma_priority_set(uint8_t channel, uint8_t priority);
+bool dma_use_alternate_control(uint8_t channel);
+bool dma_use_primary_control(uint8_t channel);
+bool dma_use_burst(uint8_t channel, uint8_t use_burst);
+bool dma_peripheral_request_mask_set(uint8_t channel, uint8_t mask);
 
 #endif
