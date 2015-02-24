@@ -5,7 +5,7 @@ PORTF 	EQU 0x400043FC
 HIGH 	EQU 0x0004
 LOW		EQU	0x0000
 
-	export pushBuffer
+	export push_buffer
 		
 ;**********************************************
 ; SRAM
@@ -20,7 +20,7 @@ LOW		EQU	0x0000
     align
 	
 	
-pushBuffer PROC
+push_buffer PROC
 	PUSH {R5-R10}
 	
 	

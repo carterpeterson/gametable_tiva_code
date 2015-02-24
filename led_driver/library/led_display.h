@@ -1,14 +1,20 @@
 #ifndef __LED_DISPLAY_H__
 #define __LED_DISPLAY_H__
 
+// C
+#include <stdint.h>
+
+// MCU
+
+// Project
+
 typedef struct {
 	uint8_t red, green, blue;
 } Pixel;
 
-extern void pushBuffer(Pixel *i);
+extern Pixel *frame_buffer;		// The buffer being modified
 
-extern Pixel *display_buffer;
-extern Pixel buffer_one[2];
-extern Pixel buffer_two[2];
+void init_buffers(void);
+void switch_buffers(void);
 
 #endif

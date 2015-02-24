@@ -12,11 +12,6 @@
 #include "../library/dma.h"
 #include "../library/uart.h"
 
-
-Pixel *display_buffer;
-Pixel buffer_one[2];
-Pixel buffer_two[2];
-
 void usleep(int microseconds)
 {
 		int i = 90000;
@@ -35,7 +30,7 @@ void dma_test(void)
 	dma_use_burst(30, DMA_USE_BURST_AND_SINGLE);
 	dma_peripheral_request_mask_set(30, DMA_REQ_MASK_PERIPHERAL);
 	
-	test_uart_tx_req.source = &(buffer_one[1].blue);	
+	test_uart_tx_req.source = &(frame_buffer[1].blue);	
 	test_uart_tx_req.destination = (void*) &(UART0->DR);
 	test_uart_tx_req.control = (DMA_DSTINC_NONE | \
 	DMA_DSTSIZE_BYTE | DMA_SRCINC_BYTE | DMA_SRCSIZE_BYTE | \
@@ -52,7 +47,7 @@ void dma_test(void)
 	UDMA->CHMAP1 &= ~(0x0F);
 	
 	test_uart_rx_req.source = (void*) &(UART0->DR);
-	test_uart_rx_req.destination = &(buffer_one[1].blue);
+	test_uart_rx_req.destination = &(frame_buffer[1].blue);
 	test_uart_rx_req.control = (DMA_DSTINC_BYTE | \
 	DMA_DSTSIZE_BYTE | DMA_SRCINC_NONE | DMA_SRCSIZE_BYTE | \
 	DMA_ARBSIZE_4 | (5U << 4) | DMA_XFERMODE_BASIC);
@@ -60,98 +55,6 @@ void dma_test(void)
 	dma_primary_control_structure_set(8, &test_uart_rx_req);
 	
 	printf("\n\r--start--\n\r");
-}
-
-void do_led_stuff(void)
-{	
-	int i, stage;
-	uint8_t red[3];
-	uint8_t	green[3];
-	uint8_t	blue[3];
-	Pixel frame_buffer[5];
-	i = 1;
-	
-	for(i = 0; i < 5; i++) {
-		frame_buffer[i].green = 0;
-		frame_buffer[i].blue = 0;
-		frame_buffer[i].red = 0;
-	}
-		
-	stage = 0;
-	red[0] = 255;
-	green[0] = 0;
-	blue[0] = 0;
-	
-	red[1] = 0;
-	green[1] = 0;
-	blue[1] = 255;
-	
-	red[2] = 0;
-	green[2] = 255;
-	blue[2] = 0;
-	
-	while(1){		
-		if(stage == 0) {
-			red[0]--;
-			green[0]++;
-			
-			red[1]++;
-			blue[1]--;
-			
-			green[2]--;
-			blue[2]++;
-			
-			if(green[0] == 255)
-				stage = 1;
-		} else if(stage == 1) {
-			green[0]--;
-			blue[0]++;
-			
-			green[1]++;
-			red[1]--;
-			
-			blue[2]--;
-			red[2]++;
-			
-			if(blue[0] == 255)
-				stage = 2;
-		} else {
-			blue[0]--;
-			red[0]++;
-			
-			green[1]--;
-			blue[1]++;
-			
-			red[2]--;
-			green[2]++;
-			
-			if(red[0] == 255)
-				stage = 0;
-		}
-		
-		frame_buffer[0].red = red[0];
-		frame_buffer[0].blue = blue[0];
-		frame_buffer[0].green = green[0];
-		
-		frame_buffer[1].red = red[0];
-		frame_buffer[1].blue = blue[0];
-		frame_buffer[1].green = green[0];
-		
-		/*frame_buffer[3].red = red[1];
-		frame_buffer[3].blue = blue[1];
-		frame_buffer[3].green = green[1];
-		
-		frame_buffer[2].red = red[2];
-		frame_buffer[2].green = green[2];
-		frame_buffer[2].blue = blue[2];
-		
-		frame_buffer[4].red = red[2];
-		frame_buffer[4].green = green[2];
-		frame_buffer[4].blue = blue[2];*/
-
-		pushBuffer(frame_buffer);
-		
-	}
 }
 
 
@@ -163,6 +66,9 @@ int main(void)
 	gpio_alternate_function_enable(PORT_A, (PIN_0 | PIN_1));
 	PORT_A->PCTL = 0x0011;
 	
+	
+	init_buffers();
+	
 	//timer_init(TIMER0);
 	//timer_periodic_enable(TIMER0);
 	
@@ -171,11 +77,8 @@ int main(void)
 	
 	dma_test();
 	
-	display_buffer = buffer_two;
-	
 	while(1) {
-		pushBuffer(display_buffer);
-		usleep(0);
+		//switch_buffers();
 	}
 	
 }
