@@ -1,11 +1,11 @@
 #include "led_display.h"
 
-Pixel buffers[2][768];
-Pixel *display_buffer, *frame_buffer; // The buffer being output via DMA
+uint8_t buffers[2][768];
+uint8_t *display_buffer, *frame_buffer; // The buffer being output via DMA
 
-extern void push_buffer(Pixel* buffer);
+extern void push_buffer(uint8_t* buffer, uint32_t size);
 
-void init_buffers(void)
+void init_screen_buffers(void)
 {
 	display_buffer = buffers[0];
 	frame_buffer = buffers[1];
@@ -13,9 +13,9 @@ void init_buffers(void)
 
 void switch_buffers(void)
 {
-	Pixel* temp = frame_buffer;
+	uint8_t* temp = frame_buffer;
 	frame_buffer = display_buffer;
 	display_buffer = temp;
 	
-	push_buffer(display_buffer);
+	push_buffer(display_buffer, 3);
 }

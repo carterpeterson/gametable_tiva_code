@@ -12,9 +12,9 @@ typedef struct {
 	uint8_t red, green, blue;
 } Pixel;
 
-extern Pixel *frame_buffer;		// The buffer being modified
+extern uint8_t *frame_buffer;		// The buffer being modified
 
-void init_buffers(void);
+void init_screen_buffers(void);
 void switch_buffers(void);
 
 #endif

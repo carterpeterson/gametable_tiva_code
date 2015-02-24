@@ -408,14 +408,34 @@
           <GroupName>src</GroupName>
           <Files>
             <File>
+              <FileName>convert_buffer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\convert_buffer.h</FilePath>
+            </File>
+            <File>
+              <FileName>convert_buffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\convert_buffer.c</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\main.c</FilePath>
             </File>
             <File>
-              <FileName>push_buffer.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>.\src\push_buffer.s</FilePath>
+              <FileName>interrupt_routines.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\interrupt_routines.h</FilePath>
+            </File>
+            <File>
+              <FileName>interrupt_routines.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\interrupt_routines.c</FilePath>
+            </File>
+            <File>
+              <FileName>config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -506,6 +526,11 @@
               <FileName>uart.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\library\uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>push_buffer.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\library\push_buffer.s</FilePath>
             </File>
           </Files>
         </Group>
