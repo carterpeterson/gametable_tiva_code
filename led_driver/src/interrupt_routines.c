@@ -7,11 +7,7 @@ void UART0_Handler(void)
 	DMA_control test_uart_rx_req;
     status = UDMA->CHIS;
 	
-	if((status & (0x01 << 8)) == (0x01 << 8)){
-		//dma_channel_request(30);
-		//display_buffer = (display_buffer == buffer_one) ? buffer_two : buffer_one;
-		//destination = (display_buffer == buffer_one) ? &(buffer_two[1].blue) : &(buffer_one[1].blue);
-		
+	if((status & (0x01 << 8)) == (0x01 << 8)){		
 		temp = write_buffer;
 		write_buffer = read_buffer;
 		read_buffer = temp;

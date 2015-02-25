@@ -17,13 +17,6 @@
 #include "../library/uart.h"
 #include "input.h"
 
-void usleep(int microseconds)
-{
-		int i = 90000;
-		while(i > 0)
-			i--;
-}
-
 int main(void)
 {	
 	gpio_port_enable(PORT_A_CGC);
