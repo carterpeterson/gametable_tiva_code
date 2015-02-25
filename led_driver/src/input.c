@@ -31,8 +31,13 @@ void init_input(void)
 	write_buffer = input_buffers[0];
 	read_buffer = input_buffers[1];
 	
-	uart_enable(UART0_CGC);
-	uart_configure(UART0, 500000);
+	uart_clock_enable(UART0_CGC);
+	uart_channel_disable(UART0);
+	uart_config_baud(UART0, 500000);
+	uart_config_line_control(UART0, (UART_CTL_WORD_LENGTH_8 | UART_LCRH_FEN));
+	uart_config_dma(UART0, UART_DMACTL_RX_EN);
+	uart_enable_interrupts(UART0, 1);
+	uart_channel_enable(UART0, UART_CTL_ENABLE | UART_CTL_RX_ENABLE | UART_CTL_TX_ENABLE);
 	
 	dma_init();
 }

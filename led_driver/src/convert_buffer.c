@@ -1,6 +1,6 @@
 #include "convert_buffer.h"
 
-#define ACTIVE_SECTIONS 1
+#define ACTIVE_SECTIONS 	1
 #define WIDTH_PIXELS 		32
 
 typedef struct {

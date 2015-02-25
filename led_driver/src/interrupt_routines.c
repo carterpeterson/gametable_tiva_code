@@ -24,6 +24,8 @@ void UART0_Handler(void)
 		
 		UDMA->CHIS |= (0x01 << 30); // Clear
 		
+		printf("done\n\r");
+		
 		convert_buffer();
 	}
 }
