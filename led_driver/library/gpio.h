@@ -11,7 +11,7 @@
 #include "TM4C123.h"
 
 // Project
-#include "config.h"
+#include "./config.h"
 #include "led_display.h"
 
 // GPIO Related Defines

@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 // Project
-#include "config.h"
+#include "app_config.h"
 #include "convert_buffer.h"
 #include "../library/dma.h"
 #include "../library/led_display.h"

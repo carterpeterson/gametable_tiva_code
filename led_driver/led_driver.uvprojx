@@ -433,9 +433,19 @@
               <FilePath>.\src\interrupt_routines.c</FilePath>
             </File>
             <File>
-              <FileName>config.h</FileName>
+              <FileName>app_config.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\src\config.h</FilePath>
+              <FilePath>.\src\app_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>input.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\input.c</FilePath>
+            </File>
+            <File>
+              <FileName>input.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\input.h</FilePath>
             </File>
           </Files>
         </Group>

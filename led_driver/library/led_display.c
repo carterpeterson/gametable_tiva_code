@@ -17,5 +17,5 @@ void switch_buffers(void)
 	frame_buffer = display_buffer;
 	display_buffer = temp;
 	
-	push_buffer(display_buffer, 3);
+	push_buffer(display_buffer, STRING_LENGTH_PIXEL);
 }

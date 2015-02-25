@@ -18,10 +18,10 @@ void UART0_Handler(void)
 		
 		dma_channel_enable(8);
 		test_uart_rx_req.source = (void*) &(UART0->DR);
-		test_uart_rx_req.destination = &(write_buffer[1].blue);
+		test_uart_rx_req.destination = &(write_buffer[STRING_LENGTH_PIXEL - 1].blue);
 		test_uart_rx_req.control = (DMA_DSTINC_BYTE | \
 		DMA_DSTSIZE_BYTE | DMA_SRCINC_NONE | DMA_SRCSIZE_BYTE | \
-		DMA_ARBSIZE_4 | (5U << 4) | DMA_XFERMODE_BASIC);
+		DMA_ARBSIZE_4 | (INPUT_BUFF_MINUS_ONE << 4) | DMA_XFERMODE_BASIC);
 	
 		dma_primary_control_structure_set(8, &test_uart_rx_req);
 		

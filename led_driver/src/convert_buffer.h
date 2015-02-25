@@ -6,7 +6,7 @@
 
 // Project
 #include "../library/led_display.h"
-#include "config.h"
+#include "app_config.h"
 
 void convert_buffer(void);
 
