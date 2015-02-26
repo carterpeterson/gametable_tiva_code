@@ -47,6 +47,17 @@ bool gpio_analog_disable(GPIOA_Type *port, uint8_t pins)
 	return true;
 }
 
+void gpio_config_port_ctl(GPIOA_Type *port, uint8_t pins, uint8_t pctl)
+{
+	int i;
+	for(i = 0; i < 8; i++) {
+		if((pins >> i) & 0x01) {
+			port->PCTL &= ~(0x0F << (i*4));
+			port->PCTL |= (pctl << (i*4));
+		}
+	}
+}
+
 bool gpio_pin_direction(GPIOA_Type *port, uint8_t direction, uint8_t pins)
 {
 	if(direction == DIRECTION_INPUT) {
@@ -63,6 +74,20 @@ bool gpio_pin_direction(GPIOA_Type *port, uint8_t direction, uint8_t pins)
 bool gpio_alternate_function_enable(GPIOA_Type *port, uint8_t pins)
 {
 	port->AFSEL |= pins;
+	
+	return true;
+}
+
+bool gpio_open_drain_enable(GPIOA_Type *port, uint8_t pins)
+{
+	port->ODR |= pins;
+	
+	return true;
+}
+
+bool gpio_open_drain_disable(GPIOA_Type *port, uint8_t pins)
+{
+	port->ODR &= ~pins;
 	
 	return true;
 }

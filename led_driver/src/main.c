@@ -24,7 +24,7 @@ int main(void)
 	gpio_pin_direction(PORT_A, DIRECTION_OUTPUT, (PIN_1 | PIN_2));
 	gpio_pin_direction(PORT_A, DIRECTION_INPUT, PIN_0);
 	gpio_alternate_function_enable(PORT_A, (PIN_0 | PIN_1));
-	PORT_A->PCTL = 0x0011;
+	gpio_config_port_ctl(PORT_A, (PIN_0 | PIN_1), 1);
 	
 	init_input();
 	init_screen_buffers();

@@ -134,4 +134,16 @@ bool gpio_pin_direction(GPIOA_Type *port, uint8_t direction, uint8_t pins);
 */
 bool gpio_alternate_function_enable(GPIOA_Type *port, uint8_t pins);
 
+/*
+*	Enable / Disable Open Drain for the specified pins
+*/
+bool gpio_open_drain_enable(GPIOA_Type *port, uint8_t pins);
+bool gpio_open_drain_disable(GPIOA_Type *port, uint8_t pins);
+
+
+/*
+*		Set the port control on the specified pins of the port
+*/
+void gpio_config_port_ctl(GPIOA_Type *port, uint8_t pins, uint8_t pctl);
+
 #endif
