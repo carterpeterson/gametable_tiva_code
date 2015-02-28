@@ -16,6 +16,7 @@
 #include "../library/dma.h"
 #include "../library/uart.h"
 #include "input.h"
+#include "capsense.h"
 
 int main(void)
 {	
@@ -28,6 +29,7 @@ int main(void)
 	
 	init_input();
 	init_screen_buffers();
+	init_capsense();
 	
 	while(1) {
 		//switch_buffers();

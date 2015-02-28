@@ -448,6 +448,16 @@
               <FileType>5</FileType>
               <FilePath>.\src\input.h</FilePath>
             </File>
+            <File>
+              <FileName>capsense.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\capsense.c</FilePath>
+            </File>
+            <File>
+              <FileName>capsense.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\capsense.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -477,11 +487,6 @@
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\library\gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>i2c.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\library\i2c.h</FilePath>
             </File>
             <File>
               <FileName>i2c.c</FileName>
