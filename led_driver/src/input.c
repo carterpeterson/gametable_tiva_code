@@ -33,7 +33,7 @@ void init_input(void)
 	
 	uart_clock_enable(UART0_CGC);
 	uart_channel_disable(UART0);
-	uart_config_baud(UART0, 500000);
+	uart_config_baud(UART0, 460800);
 	uart_config_line_control(UART0, (UART_CTL_WORD_LENGTH_8 | UART_LCRH_FEN));
 	uart_config_dma(UART0, UART_DMACTL_RX_EN);
 	uart_enable_interrupts(UART0, 1);

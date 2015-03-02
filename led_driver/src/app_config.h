@@ -3,10 +3,12 @@
 
 #include "../library/led_display.h"
 
-#define STRING_LENGTH_COLOR	15
-#define STRING_LENGTH_BITS	120
+#define STRING_LENGTH_COLOR		15
+#define STRING_LENGTH_BITS		120
 
 #define INPUT_BUFF_MINUS_ONE	14U
+
+#define MAX_TRIES_CAPSENSE		5
 
 extern Pixel *read_buffer;
 extern Pixel *write_buffer;

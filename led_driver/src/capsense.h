@@ -10,6 +10,7 @@
 // Project
 #include "input.h"
 #include "convert_buffer.h"
+#include "app_config.h"
 #include "../library/gpio.h"
 #include "../library/i2c.h"
 

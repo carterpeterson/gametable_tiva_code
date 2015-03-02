@@ -10,38 +10,62 @@ void init_capsense_gpio(void)
 
 void init_capsense_i2c(void)
 {
-	initializeI2CMaster(I2C1_BASE);
+	i2c_enable(I2C1_CGC);
+	i2c_init_master(I2C1);
+}
+
+uint8_t get_proximity(I2C0_Type *channel, uint8_t address)
+{
+	bool pass;
+	uint8_t data, retry_count = 0;
 	
+	i2c_slave_address_set(channel, address);
+	
+	i2c_slave_rw_set(channel, I2C_MSA_SLAVE_WRITE);
+		
+	do {
+		pass = i2c_send_byte(I2C1, 0xAE, true, false);
+		retry_count++;
+	} while(pass != true && retry_count <= MAX_TRIES_CAPSENSE);
+	
+	if(pass != true)
+		return 0xFF;
+	
+	i2c_slave_rw_set(channel, I2C_MSA_SLAVE_READ);
+	pass = i2c_read_byte(channel, &data, true, false);
+	
+	if(pass != true)
+		return 0xFF;
+	
+	return data;
 }
 
 void init_capsense(void)
 {
-	i2c_status_t status;
 	uint8_t data;
-
+	
 	init_capsense_gpio();
 	init_capsense_i2c();
 	
+	
 	while(1) {
-		i2cSetSlaveAddr(I2C1_BASE, 0x37, I2C_WRITE);
-		do {
-			status = i2cSendByte(I2C1_BASE, 0xAE, I2C_MCS_START | I2C_MCS_RUN);
-		} while(status != I2C_OK);
 		
-		i2cSetSlaveAddr(I2C1_BASE, 0x37, I2C_READ);
+		data = get_proximity(I2C1, 0x37);
 		
-		status = i2cGetByte(I2C1_BASE, &data, I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP);
-		
-		if(status & 0x01) {
-			read_buffer[0].red = 255;
-			read_buffer[0].blue = 0;
-			read_buffer[0].green = 0;
-		} else {
-			read_buffer[0].red = 0;
-			read_buffer[0].blue = 0;
-			read_buffer[0].green = 0;
+		if(data != 0xFF) {			
+			if(data & 0x01) {
+				read_buffer[0].red = 255;
+				read_buffer[0].blue = 0;
+				read_buffer[0].green = 0;
+				printf("0\n\r");
+			} else {
+				read_buffer[0].red = 0;
+				read_buffer[0].blue = 0;
+				read_buffer[0].green = 0;
+				printf(" \n\r");
+			}
+			
+			//convert_buffer();
 		}
-		
-		convert_buffer();
 	}
 }

@@ -1,378 +1,103 @@
 #include "i2c.h"
 
-//*****************************************************************************
-// Initializes a given I2C peripheral to operate at 100KHz.  This assumes
-// MCU core is running at 50MHz
-//
-// Paramters:
-//    base_addr:  The base address of the I2C peripheral that is being
-//                configured
-//
-// Return Value:
-//    Returns I2C_OK if the base address is a valid I2C peripheral
-//    Returns I2C_INVALID_BASE if the base address is not a valid I2C address
-//*****************************************************************************
-i2c_status_t initializeI2CMaster(uint32_t base_addr)
+static bool has_stopped = true;
+
+bool i2c_enable(uint8_t cgc_mask)
 {
-  I2C0_Type *myI2C;
-  
-  myI2C = (I2C0_Type *) base_addr;
-  
-  // Validate that a correct base address has been passed
-    // Turn on the Clock Gating Register
-    switch (base_addr) 
-    {
-      case I2C0_BASE :
-          SYSCTL->RCGCI2C |= I2C0_CGC;
-          while ((SYSCTL->PRI2C & I2C0_CGC) == 0);    /* wait until SSI is ready */
-          break;
-      case I2C1_BASE :
-          SYSCTL->RCGCI2C |= I2C1_CGC;
-          while ((SYSCTL->PRI2C & I2C1_CGC) == 0);    /* wait until SSI is ready */
-          break;
-      case I2C2_BASE :
-          SYSCTL->RCGCI2C |= I2C2_CGC;
-          while ((SYSCTL->PRI2C & I2C2_CGC) == 0);    /* wait until SSI is ready */
-          break;
-      case I2C3_BASE :
-          SYSCTL->RCGCI2C |= I2C3_CGC;
-          while ((SYSCTL->PRI2C & I2C3_CGC) == 0);    /* wait until SSI is ready */
-          break;
-      default:
-          return I2C_INVALID_BASE;
-    }
-    
-    // Enable the I2C port as master
-    myI2C->MCR = I2C_MCR_MFE;
-    
-    // Set the clock speed to be 100Kpbs assuming a 50MHz clock
-    // TPR = (System Clock/(2*(SCL_LP + SCL_HP)*SCL_CLK))-1;
-    // TPR = (50MHz/(2*(6+4)*100000))-1
-    myI2C->MTPR = 0x09;
-    
-    return I2C_OK;
+	if((cgc_mask & INVALID_CGC) != 0x00)
+		return false;
+
+	SYSCTL->RCGCI2C |= cgc_mask;
+	
+	while((SYSCTL->PRI2C & cgc_mask) != cgc_mask)
+		; // Wait
+	
+	return true;
 }
 
-//*****************************************************************************
-// verifies if the base addressed passed to a function is a valid I2C address
-//*****************************************************************************
-bool
-i2cVerifyBaseAddr(
-  uint32_t i2c_base
-)
+void i2c_init_master(I2C0_Type* i2c)
 {
-    if( i2c_base == I2C0_BASE ||
-        i2c_base == I2C1_BASE ||
-        i2c_base == I2C2_BASE ||
-        i2c_base == I2C3_BASE
-    )
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+	i2c->MCR |= I2C_MCR_MASTER_EN;
 }
 
-//*****************************************************************************
-// Sets the slave address that is currently being addressed.
-//
-// Paramters:
-//    baseAddr:  The base address of the I2C peripheral that is being
-//                configured
-//    slaveAddr: The address of the slave device being accessed.  This is a 
-//                7-bit slave address
-//    readWrite: If the the transaction will be a read or write operation.
-//               read = 0x01.  write = 0x00
-// Return Value:
-//    Returns I2C_OK if the base address is a valid I2C peripheral
-//    Returns I2C_INVALID_BASE if the base address is not a valid I2C address
-//*****************************************************************************
-i2c_status_t i2cSetSlaveAddr(
-  uint32_t baseAddr, 
-  uint8_t slaveAddr,
-  i2c_read_write_t readWrite
-)
+void i2c_init_slave(I2C0_Type* i2c)
 {
-  I2C0_Type *myI2C;
-  if( i2cVerifyBaseAddr(baseAddr) == false)
-  {
-    return I2C_INVALID_BASE;
-  }
-  
-  myI2C = (I2C0_Type *) baseAddr;
-  
-  // Set the slave address to transmit data
-   myI2C->MSA = (slaveAddr << 1) | readWrite;
-  
-  return I2C_OK;
+	i2c->MCR |= I2C_MCR_SLAVE_EN;
 }
 
-
-//*****************************************************************************
-// Initiates a stop condition.  This function is used when the master does
-// not receive and ACK.
-//
-// Paramters:
-//    baseAddr:  The base address of the I2C peripheral that is being
-//                configured
-// Return Value:
-//    Returns I2C_OK if the base address is a valid I2C peripheral
-//    Returns I2C_INVALID_BASE if the base address is not a valid I2C address
-//*****************************************************************************
-i2c_status_t i2cStop(
-  uint32_t baseAddr
-)
+void i2c_config_speed(I2C0_Type* i2c, uint8_t speed)
 {
-  I2C0_Type *myI2C;
-  if( i2cVerifyBaseAddr(baseAddr) == false)
-  {
-    return I2C_INVALID_BASE;
-  }
-  
-  myI2C = (I2C0_Type *) baseAddr;
-  
-  // Stop the interface
-  myI2C->MCS = I2C_MCS_STOP;
-  
-  return I2C_OK;
+	i2c->MTPR &= ~(0x7F);
+	i2c->MTPR |= speed;
 }
 
-//*****************************************************************************
-// Determines if the I2C device is busy transmitting data.  
-//
-// Paramters:
-//    baseAddr:  The base address of the I2C peripheral that is being accessed
-//
-// Returns
-//    Returns true if the I2C device is busy
-//    Returns false if the I2C device is NOT busy or i2c_base is invalid
-//*****************************************************************************
-bool
-I2CMasterBusy(uint32_t i2c_base)
+void i2c_slave_address_set(I2C0_Type* i2c, uint8_t addr)
 {
-  I2C0_Type *myI2C;
-  
-  if( i2cVerifyBaseAddr(i2c_base) == false)
-  {
-    return false;
-  }
-  
-    myI2C = (I2C0_Type *) i2c_base;
-    
-    if(myI2C->MCS & I2C_MCS_BUSY)
-    {
-        return(true);
-    }
-    else
-    {
-        return(false);
-    }
+	uint8_t data = i2c->MSA;
+	data &= ~(I2C_MSA_ADDR_MASK);
+	i2c->MSA = data | (addr << I2C_MSA_ADDR_SHAMT);
 }
 
-//*****************************************************************************
-// Determines if the address (control word) was ACKed.  
-//
-// Paramters:
-//    baseAddr:  The base address of the I2C peripheral that is being accessed
-//
-// Returns
-//    Returns true if the address was ACKed
-//    Returns false if the address was not ACKed or i2c_base is invalid
-//*****************************************************************************
-bool
-I2CMasterAdrAck(uint32_t i2c_base)
+void i2c_slave_rw_set(I2C0_Type* i2c, uint8_t rw_mask)
 {
-    I2C0_Type *myI2C;
-    uint32_t status;
-  if( i2cVerifyBaseAddr(i2c_base) == false)
-  {
-    return false;
-  }
-  
-  myI2C = (I2C0_Type *) i2c_base;
-  
-  status = myI2C->MCS;
-  if((status & I2C_MCS_ADRACK)!= 0)
-  {
-      return(false);
-  }
-  else
-  {
-      return(true);
-  }
+	i2c->MSA &= ~(I2C_MSA_RW_MASK);
+	i2c->MSA |= rw_mask;
 }
 
-
-//*****************************************************************************
-// Determines if the last byte of data transmitted was ACKed.  
-//
-// Paramters:
-//    baseAddr:  The base address of the I2C peripheral that is being accessed
-//
-// Returns
-//    Returns true if the data was ACKed
-//    Returns false if the data was not ACKed or i2c_base is invalid
-//*****************************************************************************
-bool
-I2CMasterDatAck(uint32_t i2c_base)
+bool i2c_send_byte(I2C0_Type* i2c, uint8_t data, bool stop, bool repeat_start)
 {
-    I2C0_Type *myI2C;
-    uint32_t status;
-  if( i2cVerifyBaseAddr(i2c_base) == false)
-  {
-    return false;
-  }
-  
-  myI2C = (I2C0_Type *) i2c_base;
-  
-  status = myI2C->MCS;
-  if((status & I2C_MCS_DATACK)!= 0)
-  {
-      return(false);
-  }
-  else
-  {
-      return(true);
-  }
+	uint8_t command = I2C_MCS_RUN;
+	
+	i2c->MDR = data;
+	
+	if(has_stopped || repeat_start) {
+		command |= I2C_MCS_START;
+	}
+	
+	if(stop) {
+		command |= I2C_MCS_STOP;
+		has_stopped = true;
+	} else {
+		has_stopped = false;
+	}
+	
+	i2c->MCS = command;
+	
+	while(i2c->MCS & I2C_MCS_BUSY)
+		; // Do nothing
+	
+	//printf("%d\n\r", wasted);
+	
+	if(i2c->MCS & (I2C_MCS_ARB_LOST | I2C_MCS_DATA_ACK | I2C_MCS_ADDR_ACK | I2C_MCS_ERROR)) {
+		i2c->MCS = I2C_MCS_STOP;
+		return false;
+	}
+	
+	return true;
 }
 
-//*****************************************************************************
-// Sends one byte of data over a I2C bus.  
-//
-// Paramters:
-//    baseAddr:  The base address of the I2C peripheral that is being
-//                configured
-//    byte:      The next byte of the data transaction.
-//    mcs:       Sets master control register of the I2C peripheral. Since a
-//               data transaction can consist of multiple bytes, the value
-//               of mcs is used to determine when start and stop bits are 
-//               generated.
-//
-// Examples:
-//    * Sending control word (i2c address) + write 1st byte of data. This
-//    * assumes that additional bytes will follow in the transaction
-//    i2cSendByte(I2C0_BASE, byte, I2C_MCS_START | I2C_MCS_RUN);
-//
-//    * Sending a byte in the middle of a multi-byte operation. (> 2 bytes)
-//    i2cSendByte(I2C0_BASE, byte, I2C_MCS_RUN);
-//
-//    * Sending final byte  of data
-//    i2cSendByte(I2C0_BASE, byte, I2C_MCS_RUN | I2C_MCS_STOP);
-//
-//    * Sending control word (i2c address) + a single byte transaction.
-//    i2cSendByte(I2C0_BASE, byte, I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP);
-//
-// Return Value:
-//    Returns I2C_OK if the base address is a valid and the data was 
-//    transmitted sucessfully.
-//*****************************************************************************
-i2c_status_t i2cSendByte(
-  uint32_t baseAddr, 
-  uint8_t byte, 
-  uint8_t mcs
-)
+bool i2c_read_byte(I2C0_Type* i2c, uint8_t *data, bool stop, bool repeat_start)
 {
-  I2C0_Type *myI2C;
-  
-  if( i2cVerifyBaseAddr(baseAddr) == false)
-  {
-    return I2C_INVALID_BASE;
-  }
-  myI2C = (I2C0_Type *) baseAddr;
-  
-   // Write the upper address to the data register
-  myI2C->MDR   = byte;
-  
-  // Start the transaction
-  myI2C->MCS = mcs;
-  
-  // Wait for the device to be free
-  while ( I2CMasterBusy(baseAddr)) {};
-  
-    // Check for error conditions
-  if ( myI2C->MCS & (I2C_MCS_ERROR | I2C_MCS_ARBLST) )
-  {
-      return I2C_ARBLST;
-  }
-  else if ( myI2C->MCS & I2C_MCS_ERROR )
-  {
-    myI2C->MCS = I2C_MCS_STOP;
-    return I2C_BUS_ERROR;
-  }
-  else if ( myI2C->MCS & I2C_MCS_DATACK )
-  {
-    return I2C_NO_ACK;
-  }
-  else
-  {
-    return I2C_OK;
-  }
-}
-
-//*****************************************************************************
-// Reads one byte of data over a I2C bus.  
-//
-// Paramters:
-//    baseAddr:  The base address of the I2C peripheral that is being
-//                configured
-//    data:      The data read by the transaction.
-//    mcs:       Sets master control register of the I2C peripheral. Since a
-//               data transaction can consist of multiple bytes, the value
-//               of mcs is used to determine when start and stop bits are 
-//               generated.
-//
-// Examples:
-//    * Sending control word (i2c address) + read 1st byte of data. This
-//    * assumes that additional bytes be read after this byte.  This
-//    * would be used for reading multiple bytes at consecutive addresses
-//    * in the slave address.  
-//    i2cGetByte(I2C0_BASE, byte, I2C_MCS_START | I2C_MCS_RUN);
-//
-//    * Reading a byte in the middle of a multi-byte operation. (> 2 bytes)
-//    i2cGetByte(I2C0_BASE, byte, I2C_MCS_RUN);
-//
-//    * Reading final byte of data in a multi-byte read 
-//    i2cGetByte(I2C0_BASE, byte, I2C_MCS_RUN | I2C_MCS_STOP);
-//
-//    * Sending control word (i2c address) + reading a single byte read.
-//    i2cGetByte(I2C0_BASE, byte, I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP);
-//
-// Return Value:
-//    Returns I2C_OK if the base address is a valid and the data was 
-//    transmitted sucessfully.
-//*****************************************************************************
-i2c_status_t i2cGetByte(
-  uint32_t baseAddr, 
-  uint8_t *data, 
-  uint8_t mcs
-)
-{
-  I2C0_Type *myI2C;
-  
-  if( i2cVerifyBaseAddr(baseAddr) == false)
-  {
-    return I2C_INVALID_BASE;
-  }
-  
- myI2C = (I2C0_Type *) baseAddr;
-  
-  // Start the transaction
-  myI2C->MCS = mcs;
-  
-  // Wait for the device to be free
-  while ( I2CMasterBusy(baseAddr)) {};
-  
-  // Check for error conditions
-  if ( myI2C->MCS & I2C_MCS_ERROR  )
-  {
-    myI2C->MCS = I2C_MCS_STOP;
-    return I2C_BUS_ERROR;
-  }
-  else
-  {
-    *data = myI2C->MDR;
-    return I2C_OK;
-  }
+	uint8_t command = I2C_MCS_RUN;
+	
+	if(has_stopped || repeat_start) {
+		command |= I2C_MCS_START;
+	}
+	
+	if(stop) {
+		command |= I2C_MCS_STOP;
+		has_stopped = true;
+	} else {
+		has_stopped = false;
+	}
+	
+	i2c->MCS = command;
+	while(i2c->MCS & I2C_MCS_BUSY)
+		;	// Do nothing
+	
+	if(i2c->MCS & (I2C_MCS_ERROR))
+		return false;
+	
+	*data = i2c->MDR;
+	return true;
 }
