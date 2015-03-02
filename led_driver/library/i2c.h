@@ -17,6 +17,23 @@
 *		I2C related defines
 */
 
+typedef struct {
+	bool read_req;
+	uint8_t device_addr;
+	uint32_t size;
+	uint8_t	data;
+	bool complete;
+} I2C_request;
+
+typedef struct {
+	I2C0_Type* channel;
+	bool busy;
+	I2C_request* current_request;
+	uint8_t attempt;
+}	I2C_channel;
+
+static I2C_channel i2c1 = {I2C1, 0, 0, 0};
+
 //	Clock Gating
 #define I2C0_CGC		0x01
 #define I2C1_CGC		0x02
@@ -62,10 +79,13 @@
 bool i2c_enable(uint8_t cgc_mask);
 void i2c_init_master(I2C0_Type* i2c);
 void i2c_init_slave(I2C0_Type* i2c);
+void i2c_master_interrupt_enable(I2C0_Type* i2c, uint8_t priority);
 void i2c_config_speed(I2C0_Type* i2c, uint8_t speed);
 void i2c_slave_address_set(I2C0_Type* i2c, uint8_t addr);
 void i2c_slave_rw_set(I2C0_Type* i2c, uint8_t rw_mask);
 bool i2c_send_byte(I2C0_Type* i2c, uint8_t data, bool stop, bool repeat_start);
 bool i2c_read_byte(I2C0_Type* i2c, uint8_t *data, bool stop, bool repeat_start);
+void i2c_handle_request(I2C_channel *channel, I2C_request *req);
+void i2c_retry_request(I2C_channel *channel);
 
 #endif

@@ -31,6 +31,32 @@ void i2c_config_speed(I2C0_Type* i2c, uint8_t speed)
 	i2c->MTPR |= speed;
 }
 
+void i2c_master_interrupt_enable(I2C0_Type* i2c, uint8_t priority)
+{
+	IRQn_Type interrupt_vector;
+	
+	switch((uint32_t) i2c) {
+	case(I2C0_BASE):
+		interrupt_vector = I2C0_IRQn;
+		break;
+	case(I2C1_BASE):
+		interrupt_vector = I2C1_IRQn;
+		break;
+	case(I2C2_BASE):
+		interrupt_vector = I2C2_IRQn;
+		break;
+	case(I2C3_BASE):
+		interrupt_vector = I2C3_IRQn;
+		break;
+	default:
+		return;
+	}
+	
+	i2c->MIMR = 0x01;
+	NVIC_SetPriority(interrupt_vector, priority);
+	NVIC_EnableIRQ(interrupt_vector);
+}
+
 void i2c_slave_address_set(I2C0_Type* i2c, uint8_t addr)
 {
 	uint8_t data = i2c->MSA;
@@ -63,16 +89,6 @@ bool i2c_send_byte(I2C0_Type* i2c, uint8_t data, bool stop, bool repeat_start)
 	
 	i2c->MCS = command;
 	
-	while(i2c->MCS & I2C_MCS_BUSY)
-		; // Do nothing
-	
-	//printf("%d\n\r", wasted);
-	
-	if(i2c->MCS & (I2C_MCS_ARB_LOST | I2C_MCS_DATA_ACK | I2C_MCS_ADDR_ACK | I2C_MCS_ERROR)) {
-		i2c->MCS = I2C_MCS_STOP;
-		return false;
-	}
-	
 	return true;
 }
 
@@ -100,4 +116,43 @@ bool i2c_read_byte(I2C0_Type* i2c, uint8_t *data, bool stop, bool repeat_start)
 	
 	*data = i2c->MDR;
 	return true;
+}
+
+void i2c_handle_request(I2C_channel *channel, I2C_request *req)
+{
+	printf("%x\n\r", req->device_addr);
+	
+	while(channel->busy)
+		; // Wait for channel to open up
+	
+	channel->current_request = req;
+	channel->busy = true;
+	i2c_slave_address_set(channel->channel, req->device_addr);
+	
+	if(req->read_req) {
+		i2c_slave_rw_set(channel->channel, I2C_MSA_SLAVE_READ);
+	} else {
+		i2c_slave_rw_set(channel->channel, I2C_MSA_SLAVE_WRITE);
+		channel->channel->MDR = req->data;
+	}
+	
+	channel->channel->MCS = I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP;
+}
+
+void i2c_retry_request(I2C_channel *channel)
+{
+	printf("%x\n\r", channel->current_request->device_addr);
+	
+	/*channel->current_request = req;
+	channel->busy = true;
+	i2c_slave_address_set(channel->channel, req->device_addr);
+	
+	if(req->read_req) {
+		i2c_slave_rw_set(channel->channel, I2C_MSA_SLAVE_READ);
+	} else {
+		i2c_slave_rw_set(channel->channel, I2C_MSA_SLAVE_WRITE);
+		channel->channel->MDR = req->data;
+	}
+	
+	channel->channel->MCS = I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP;*/
 }

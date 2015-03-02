@@ -8,7 +8,7 @@
 
 #define INPUT_BUFF_MINUS_ONE	14U
 
-#define MAX_TRIES_CAPSENSE		5
+#define MAX_TRIES_CAPSENSE		3
 
 extern Pixel *read_buffer;
 extern Pixel *write_buffer;

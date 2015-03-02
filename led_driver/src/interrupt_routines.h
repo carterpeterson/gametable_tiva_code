@@ -9,5 +9,6 @@
 #include "convert_buffer.h"
 #include "../library/dma.h"
 #include "../library/led_display.h"
+#include "../library/i2c.h"
 
 #endif
