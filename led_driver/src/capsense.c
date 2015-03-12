@@ -27,7 +27,7 @@ uint8_t get_proximity(I2C0_Type *channel, uint8_t address)
 	do {
 		pass = i2c_send_byte(I2C1, 0xAE, true, false);
 		retry_count++;
-	} while(pass != true && retry_count <= MAX_TRIES_CAPSENSE);
+	} while(pass != true && retry_count <= 5);
 	
 	/*if(pass != true)
 		return 0xFF;
@@ -43,8 +43,8 @@ uint8_t get_proximity(I2C0_Type *channel, uint8_t address)
 
 void init_capsense(void)
 {
-	int wait;
 	uint8_t data;
+	int wait;
 	I2C_request req;
 	
 	init_capsense_gpio();
@@ -60,10 +60,12 @@ void init_capsense(void)
 		req.size = 1;
 		
 		i2c_handle_request(&i2c1, &req);
-		
+
 		wait = 0;
+		
 		while(1)
 			wait++;
+			//count++;
 		
 		/*if(data != 0xFF) {			
 			if(data & 0x01) {

@@ -1,5 +1,7 @@
 #include "interrupt_routines.h"
 
+int count = 0;
+
 void UART0_Handler(void)
 {    
 	uint32_t  status;
@@ -28,35 +30,4 @@ void UART0_Handler(void)
 		
 		convert_buffer();
 	}
-}
-
-void I2C1_Handler(void)
-{
-	int i = 0;
-	for(; i < 200; i++)
-		; // Wait
-	
-	printf("%x\n\r", I2C1->MCS);
-	printf("%x\n\r", i2c1.current_request->device_addr);
-	
-	/*if(I2C1->MCS & (I2C_MCS_ARB_LOST | I2C_MCS_DATA_ACK | I2C_MCS_ADDR_ACK | I2C_MCS_ERROR)) {
-		
-		if(i2c1.attempt < MAX_TRIES_CAPSENSE) {
-			printf("r");
-			i2c1.attempt++;
-			i2c_retry_request(&i2c1);
-		} else {
-			printf("d\n");
-			i2c1.busy = false;
-			i2c1.current_request = 0x00;
-			i2c1.attempt = 0;
-		}
-		
-	} else {
-		//printf("y\n");
-		
-		i2c1.busy = false;
-	}*/
-	
-	I2C1->MICR = 0x01;	// Clear
 }

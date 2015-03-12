@@ -32,7 +32,7 @@ typedef struct {
 	uint8_t attempt;
 }	I2C_channel;
 
-static I2C_channel i2c1 = {I2C1, 0, 0, 0};
+extern I2C_channel i2c1;
 
 //	Clock Gating
 #define I2C0_CGC		0x01
