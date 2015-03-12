@@ -160,20 +160,36 @@ void I2C1_Handler(void)
 	if(I2C1->MCS & (I2C_MCS_ARB_LOST | I2C_MCS_DATA_ACK | I2C_MCS_ADDR_ACK | I2C_MCS_ERROR)) {
 		
 		if(i2c1.attempt < MAX_TRIES_I2C) {
-			//printf("r");
 			i2c1.attempt++;
+			printf("r");
 			i2c_retry_request(&i2c1);
 		} else {
-			//printf("d\n");
-			i2c1.busy = false;
-			i2c1.current_request = 0x00;
 			i2c1.attempt = 0;
+			i2c1.busy = false;
+		
+			if(i2c1.current_request->next_req) {
+				
+				i2c_handle_request(&i2c1, i2c1.current_request->next_req);
+			} else {
+				i2c1.current_request = 0x00;
+			}
 		}
 		
 	} else {
-		//printf("y\n");
 		i2c1.attempt = 0;
 		i2c1.busy = false;
+		
+		if(i2c1.current_request->read_req) {
+			i2c1.current_request->data = I2C1->MDR;
+		}
+		
+		if(i2c1.current_request->next_req) {
+			i2c_handle_request(&i2c1, i2c1.current_request->next_req);
+		} else {
+			printf("---\n\r");
+			printf("%d\n\r", i2c1.current_request->data);
+			i2c1.current_request = 0x00;
+		}
 	}
 	
 	I2C1->MICR = 0x01;	// Clear

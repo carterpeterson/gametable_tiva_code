@@ -43,9 +43,8 @@ uint8_t get_proximity(I2C0_Type *channel, uint8_t address)
 
 void init_capsense(void)
 {
-	uint8_t data;
 	int wait;
-	I2C_request req;
+	I2C_request write_req, read_req;
 	
 	init_capsense_gpio();
 	init_capsense_i2c();
@@ -54,17 +53,25 @@ void init_capsense(void)
 	while(1) {
 		
 		//data = get_proximity(I2C1, 0x37);
-		req.device_addr = 0x37;
-		req.read_req = false;
-		req.data = 0xAE;
-		req.size = 1;
+		write_req.device_addr = 0x37;
+		write_req.read_req = false;
+		write_req.data = 0xAE;
+		write_req.size = 1;
+		write_req.next_req = &read_req;
 		
-		i2c_handle_request(&i2c1, &req);
+		read_req.device_addr = 0x37;
+		read_req.read_req = true;
+		read_req.size = 1;
+		read_req.next_req = 0;
+		read_req.data = 0;
+		
+		i2c_handle_request(&i2c1, &write_req);
 
 		wait = 0;
 		
-		while(1)
+		while(1) {
 			wait++;
+		}
 			//count++;
 		
 		/*if(data != 0xFF) {			

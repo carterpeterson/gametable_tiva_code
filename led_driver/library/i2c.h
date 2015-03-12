@@ -17,12 +17,14 @@
 *		I2C related defines
 */
 
-typedef struct {
+typedef struct i2c_req_t {
 	bool read_req;
-	uint8_t device_addr;
-	uint32_t size;
-	uint8_t	data;
 	bool complete;
+	bool dependent;
+	uint8_t device_addr;
+	uint8_t	data;
+	uint32_t size;
+	struct i2c_req_t* next_req;
 } I2C_request;
 
 typedef struct {
