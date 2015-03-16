@@ -50,9 +50,7 @@ void init_capsense(void)
 	init_capsense_i2c();
 	
 	
-	while(1) {
-		
-		//data = get_proximity(I2C1, 0x37);
+	while(1) {	
 		write_req.device_addr = 0x37;
 		write_req.read_req = false;
 		write_req.data = 0xAE;
@@ -66,11 +64,18 @@ void init_capsense(void)
 		read_req.data = 0;
 		
 		i2c_handle_request(&i2c1, &write_req);
-
-		wait = 0;
 		
 		while(1) {
-			wait++;
+			if(i2c1.update_pending) {
+				i2c_handle_response(&i2c1);
+			} else if (i2c1.busy == false) {
+				wait = 0;
+				while(wait < 3000000)
+					wait++;
+					
+				read_req.data = 0;	
+				i2c_handle_request(&i2c1, &write_req);
+			}
 		}
 			//count++;
 		

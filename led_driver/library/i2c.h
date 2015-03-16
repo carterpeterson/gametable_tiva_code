@@ -28,10 +28,12 @@ typedef struct i2c_req_t {
 } I2C_request;
 
 typedef struct {
-	I2C0_Type* channel;
 	bool busy;
-	I2C_request* current_request;
+	bool update_pending;
 	uint8_t attempt;
+	uint8_t status;
+	I2C_request* current_request;
+	I2C0_Type* channel;
 }	I2C_channel;
 
 extern I2C_channel i2c1;
@@ -89,5 +91,6 @@ bool i2c_send_byte(I2C0_Type* i2c, uint8_t data, bool stop, bool repeat_start);
 bool i2c_read_byte(I2C0_Type* i2c, uint8_t *data, bool stop, bool repeat_start);
 void i2c_handle_request(I2C_channel *channel, I2C_request *req);
 void i2c_retry_request(I2C_channel *channel);
+void i2c_handle_response(I2C_channel *channel);
 
 #endif
