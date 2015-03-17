@@ -15,7 +15,7 @@
 #include "../library/gpio.h"
 #include "../library/i2c.h"
 
-void init_capsense(void);
+//void init_capsense(void);
 
 
 
