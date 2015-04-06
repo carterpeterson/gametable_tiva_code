@@ -8,7 +8,7 @@
 
 // Project
 
-#define STRING_LENGTH_PIXEL 5
+#define STRING_LENGTH_PIXEL 8
 
 typedef struct {
 	uint8_t red, green, blue;

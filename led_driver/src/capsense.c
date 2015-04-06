@@ -44,26 +44,38 @@ uint8_t get_proximity(I2C0_Type *channel, uint8_t address)
 void init_capsense(void)
 {
 	int wait;
-	I2C_request write_req, read_req;
+	I2C_request write_req_0, read_req_0, write_req_1, read_req_1;
 	
 	init_capsense_gpio();
 	init_capsense_i2c();
 	
 	
 	while(1) {	
-		write_req.device_addr = 0x37;
-		write_req.read_req = false;
-		write_req.data = 0xAE;
-		write_req.size = 1;
-		write_req.next_req = &read_req;
+		write_req_0.device_addr = 0x20;
+		write_req_0.read_req = false;
+		write_req_0.data = 0xAE;
+		write_req_0.size = 1;
+		write_req_0.next_req = &read_req_0;
 		
-		read_req.device_addr = 0x37;
-		read_req.read_req = true;
-		read_req.size = 1;
-		read_req.next_req = 0;
-		read_req.data = 0;
+		read_req_0.device_addr = 0x20;
+		read_req_0.read_req = true;
+		read_req_0.size = 1;
+		read_req_0.next_req = 0;//&write_req_1;
+		read_req_0.data = 0;
 		
-		i2c_handle_request(&i2c1, &write_req);
+		/*write_req_1.device_addr = 0x21;
+		write_req_1.read_req = false;
+		write_req_1.data = 0xAE;
+		write_req_1.size = 1;
+		write_req_1.next_req = &read_req_1;
+		
+		read_req_1.device_addr = 0x21;
+		read_req_1.read_req = true;
+		read_req_1.size = 1;
+		read_req_1.next_req = 0;
+		read_req_1.data = 0;*/
+		
+		i2c_handle_request(&i2c1, &write_req_0);
 		
 		while(1) {
 			if(i2c1.update_pending) {
@@ -73,8 +85,10 @@ void init_capsense(void)
 				while(wait < 3000000)
 					wait++;
 					
-				read_req.data = 0;	
-				i2c_handle_request(&i2c1, &write_req);
+				printf("%d %d\n\r", read_req_0.data, read_req_1.data);
+				read_req_0.data = 0;
+				read_req_1.data = 0;
+				i2c_handle_request(&i2c1, &write_req_0);
 			}
 		}
 			//count++;

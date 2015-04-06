@@ -1,8 +1,8 @@
 ;**********************************************
 ; Things
 ;**********************************************
-PORTF 	EQU 0x400043FC
-HIGH 	EQU 0x0004
+PORT 	EQU 0x400053FC
+HIGH 	EQU 0x00FF
 LOW		EQU	0x0000
 
 	export push_buffer
@@ -26,7 +26,7 @@ push_buffer PROC
 	MOV		R2, #HIGH
 	MOV 	R3, #LOW
 	
-	MOV32	R4, PORTF
+	MOV32	R4, PORT
 	MOV 	R5, #24
 	MUL		R1, R1, R5
 	MOV		R5, #0

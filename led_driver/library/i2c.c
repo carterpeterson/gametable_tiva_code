@@ -187,7 +187,6 @@ void i2c_handle_response(I2C_channel *channel)
 		
 		if(channel->current_request->read_req) {
 			channel->current_request->data = channel->channel->MDR;
-			printf("%d\n\r", channel->current_request->data);
 		}
 		
 		if(channel->current_request->next_req) {
