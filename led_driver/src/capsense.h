@@ -14,8 +14,11 @@
 #include "../library/gpio.h"
 #include "../library/i2c.h"
 
+#define PIXELS_PER_TOUCH_SECTION 	32
+
+
+extern uint32_t *touch_read_buffer;
+
 void init_capsense(void);
-
-
 
 #endif

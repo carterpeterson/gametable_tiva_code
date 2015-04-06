@@ -10,6 +10,4 @@
 #include "led_display.h"
 #include "../library/i2c.h"
 
-extern int count;
-
 #endif

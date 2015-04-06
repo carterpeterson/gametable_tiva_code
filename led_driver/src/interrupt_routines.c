@@ -1,7 +1,5 @@
 #include "interrupt_routines.h"
 
-int count = 0;
-
 void UART0_Handler(void)
 {    
 	uint32_t  status;

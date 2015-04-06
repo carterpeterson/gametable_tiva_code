@@ -31,7 +31,7 @@ int main(void)
 	
 	init_input();
 	init_led_display();
-	//init_capsense();
+	init_capsense();
 	count = 0;
 	
 	printf(":)");
