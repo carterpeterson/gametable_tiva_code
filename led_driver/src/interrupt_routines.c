@@ -23,8 +23,7 @@ void UART0_Handler(void)
 	
 		dma_primary_control_structure_set(8, &test_uart_rx_req);
 		
-		
-		UDMA->CHIS |= (0x01 << 30); // Clear
+		UDMA->CHIS |= (0x01 << 8); // Clear
 		
 		printf("done\n\r");
 		

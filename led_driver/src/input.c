@@ -23,14 +23,22 @@ void dma_init(void)
 	
 	dma_primary_control_structure_set(8, &test_uart_rx_req);
 	
-	printf("\n\r--start--\n\r");
+	printf("\n\r-dma-\n\r");
 }
 
-void init_input(void)
+void init_input_gpio(void)
 {
-	write_buffer = input_buffers[0];
-	read_buffer = input_buffers[1];
-	
+	// Enable the UART0 GPIO to recieve frame buffer / debug output enable
+	gpio_port_enable(PORT_A_CGC);
+	gpio_digital_enable(PORT_A, (PIN_0 | PIN_1 | PIN_2));
+	gpio_pin_direction(PORT_A, DIRECTION_OUTPUT, (PIN_1 | PIN_2));
+	gpio_pin_direction(PORT_A, DIRECTION_INPUT, PIN_0);
+	gpio_alternate_function_enable(PORT_A, (PIN_0 | PIN_1));
+	gpio_config_port_ctl(PORT_A, (PIN_0 | PIN_1), 1);
+}
+
+void init_input_uart(void)
+{
 	uart_clock_enable(UART0_CGC);
 	uart_channel_disable(UART0);
 	uart_config_baud(UART0, 460800);
@@ -38,6 +46,14 @@ void init_input(void)
 	uart_config_dma(UART0, UART_DMACTL_RX_EN);
 	uart_enable_interrupts(UART0, 1);
 	uart_channel_enable(UART0, UART_CTL_ENABLE | UART_CTL_RX_ENABLE | UART_CTL_TX_ENABLE);
+}
+
+void init_input(void)
+{
+	write_buffer = input_buffers[0];
+	read_buffer = input_buffers[1];
 	
+	init_input_gpio();
+	init_input_uart();
 	dma_init();
 }

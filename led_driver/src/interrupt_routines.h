@@ -6,9 +6,8 @@
 
 // Project
 #include "app_config.h"
-#include "convert_buffer.h"
 #include "../library/dma.h"
-#include "../library/led_display.h"
+#include "led_display.h"
 #include "../library/i2c.h"
 
 extern int count;
