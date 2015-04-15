@@ -1,145 +1,95 @@
-#include "../include/uart.h"
+#include "uart.h"
 
-/****************************************************************************
- * Verify that the uart base address is valid
- ****************************************************************************/
-bool verifyUartBase(uint32_t base)
+void uart_clock_enable(uint8_t uarts)
 {
-   switch(base)
-   {
-     case UART0_BASE:
-     case UART1_BASE:
-     case UART2_BASE:
-     case UART3_BASE:
-     case UART4_BASE:
-     case UART5_BASE:
-     case UART6_BASE:
-     case UART7_BASE:
-     {
-       return true;
-     }
-     default:
-     {
-       return false;
-     }
-   }
+	SYSCTL->RCGCUART |= uarts;
+	
+	while((SYSCTL->PRUART & uarts) != uarts)
+		;	// Wait for periheral ready
 }
 
-/****************************************************************************
- * This routine transmits a single character out the UART / COM port.
- * Only the lower 8 bits of the 'data' variable are transmitted.
- ****************************************************************************/
-void uartTxPollChar(uint32_t base, char data)
+void uart_channel_disable(UART0_Type *uart)
 {
-  UART0_Type *myUart =((UART0_Type *) base);
-
-  if( verifyUartBase(base) == false)
-  {
-    return;
-  }
-
-  if ( data != 0)
-  {
-    while( ((myUart->FR)&(UART_FR_TXFF)) != 0 );
-    myUart->DR = data;
-  }
-  return;
+	uart->CTL &= ~UART_CTL_ENABLE;
 }
 
-/****************************************************************************
- * This routine transmits a character string out the UART / COM port.
- * Only the lower 8 bits of the 'data' variable are transmitted.
- ****************************************************************************/
-void uartTxPoll(uint32_t base, char *data)
+void uart_channel_enable(UART0_Type *uart, uint32_t enable_flags)
 {
-  UART0_Type *myUart =((UART0_Type *) base);
-
-  if( verifyUartBase(base) == false)
-  {
-    return;
-  }
-
-  if ( data != 0)
-  {
-    while(*data != '\0')
-    {
-      while( ((myUart->FR)&(UART_FR_TXFF)) != 0 );
-      myUart->DR = *data;
-      data++;
-    }
-  }
-  return;
+	uart->CTL = enable_flags;
 }
 
-/****************************************************************************
- * This routine returns a character received from the UART/COM port.
- * If blocking is enabled, this routine should not return until data
- * is available. If blocking is disabled and no data is available,
- * this function should return 0.
- ****************************************************************************/
-char uartRxPoll(uint32_t base, bool block)
-{
-  UART0_Type *myUart =((UART0_Type *) base);
+void uart_config_baud(UART0_Type *uart, uint32_t baud_rate)
+{	
+	// Calculate baud rate
+	float brd = ((float) SYSTEM_CLOCK_RATE) / ((float) (16 * baud_rate));
+	int fbrd = (int) (((brd - floor(brd)) * 64) + 0.5);	
 
-  if( verifyUartBase(base) == false)
-  {
-    return 0;
-  }
-
-  if( (block == false) && !(myUart->FR & UART_FR_RXFE))
-  {
-       return myUart->DR;
-  }
-  else if((block == false) && (myUart->FR & UART_FR_RXFE))
-  {
-    return 0;
-  }
-
-  while(myUart->FR & UART_FR_RXFE && block)
-  {
-    // Wait
-  }
-
-   return myUart->DR;
+	// Set baud rate
+	uart->IBRD = (int) floor(brd);
+	uart->FBRD = fbrd;
 }
 
-//************************************************************************
-// Configure UART0 to be 115200, 8N1.  Data will be sent/recieved using
-// polling (Do Not enable interrupts)
-//************************************************************************
-bool uart_init_115K(uint32_t base_addr)
+void uart_config_line_control(UART0_Type *uart, uint8_t line_control)
 {
-    UART0_Type *myUart;
+  uart->LCRH = line_control;
+}
+
+void uart_enable_interrupts(UART0_Type *uart, uint8_t priority)
+{
+	IRQn_Type interrupt_vector;
+	
+	switch((uint32_t) uart) {
+	case(UART0_BASE):
+		interrupt_vector = UART0_IRQn;
+		break;
+	case(UART1_BASE):
+		interrupt_vector = UART1_IRQn;
+		break;
+	case(UART2_BASE):
+		interrupt_vector = UART2_IRQn;
+		break;
+	case(UART3_BASE):
+		interrupt_vector = UART3_IRQn;
+		break;
+	case(UART4_BASE):
+		interrupt_vector = UART4_IRQn;
+		break;
+	case(UART5_BASE):
+		interrupt_vector = UART5_IRQn;
+		break;
+	case(UART6_BASE):
+		interrupt_vector = UART6_IRQn;
+		break;
+	case(UART7_BASE):
+		interrupt_vector = UART7_IRQn;
+		break;
+	default:
+		return;
+	}
+	
+	
+  // Set the priority to 1
+  NVIC_SetPriority(interrupt_vector, priority);
   
-    if( verifyUartBase(base_addr) == false)
-    {
-      return false;
-    }
-    
-    myUart = (UART0_Type *)base_addr;
-    
-    // Turn on the UART Clock
-    SYSCTL->RCGCUART |= SYSCTL_RCGCUART_R0;
-    
-    // Wait until the UART is ready
-    while( (SYSCTL->PRUART & SYSCTL_PRUART_R0) == 0)
-    {
-      // busy wait
-    }
-    
-    // Set the baud rate
-    myUart->IBRD = 27;
-    myUart->FBRD = 9;
-    
-    // Disable UART
-    myUart->CTL &= ~UART_CTL_UARTEN;
-    
-    // Configure the Line Control for 8N1, no FIFOs
-    myUart->LCRH =   UART_LCRH_WLEN_8; 
-    
-    // Enable Tx, Rx, and the UART
-    myUart->CTL =  UART_CTL_RXE |  UART_CTL_TXE |  UART_CTL_UARTEN;
-    
-    return true;
+  // Enable the NVIC
+  NVIC_EnableIRQ(interrupt_vector);
+}
 
+void uart_config_dma(UART0_Type *uart, uint8_t dma_config)
+{
+	uart->DMACTL = dma_config;
+}
+
+// Functions needed for the ARM MicroLib stdio to work properly
+
+int fputc(int c, FILE* stream)
+{
+	UART0->DR = c;
+
+	return c;
+}
+
+int fgetc(FILE *stream)
+{
+	return 0;
 }
