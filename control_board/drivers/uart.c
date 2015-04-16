@@ -77,7 +77,7 @@ void uart_enable_interrupts(UART0_Type *uart, uint8_t priority)
 
 void uart_config_dma(UART0_Type *uart, uint8_t dma_config)
 {
-	uart->DMACTL = dma_config;
+	uart->DMACTL |= dma_config;
 }
 
 // Functions needed for the ARM MicroLib stdio to work properly

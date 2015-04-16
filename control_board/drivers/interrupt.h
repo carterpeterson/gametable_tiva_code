@@ -11,7 +11,6 @@
 #include "pc_buffer.h"
 #include "uart.h"
 #include "dma.h"
-#include "../src/led_display.h"
 
 void DisableInterrupts(void);
 void EnableInterrupts(void);

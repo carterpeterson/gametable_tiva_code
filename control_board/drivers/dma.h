@@ -83,10 +83,10 @@
 *			µDMA controller re-arbitrates. The possible arbitration rate configurations
 *			represent powers of 2 and are shown below.
 */
-#define DMA_ARBSIZE_1			(0x0 << 16)
-#define DMA_ARBSIZE_2			(0x1 << 16)
-#define DMA_ARBSIZE_4			(0x2 << 16)
-#define DMA_ARBSIZE_8			(0x3 << 16)
+#define DMA_ARBSIZE_1		(0x0 << 16)
+#define DMA_ARBSIZE_2		(0x1 << 16)
+#define DMA_ARBSIZE_4		(0x2 << 16)
+#define DMA_ARBSIZE_8		(0x3 << 16)
 #define DMA_ARBSIZE_16		(0x4 << 16)
 #define DMA_ARBSIZE_32		(0x5 << 16)
 #define DMA_ARBSIZE_64		(0x6 << 16)

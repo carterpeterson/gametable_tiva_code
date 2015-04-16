@@ -12,7 +12,6 @@
 
 // Project
 #include "./config.h"
-#include "../src/led_display.h"
 
 // GPIO Related Defines
 #define PIN_0 0x01

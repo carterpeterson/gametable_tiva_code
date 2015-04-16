@@ -29,14 +29,7 @@
 #include "queue.h"
 #include "semphr.h"
 
-#include "../include/gpio.h"
-#include "../include/uart.h"
-#include "task_console.h"
-#include "task_wireless.h"
-
-
-#define PA0 (1 << 0)
-#define PA1 (1 << 1)
+#include "led_display.h"
 
 
 //*****************************************************************************
@@ -46,18 +39,101 @@
 //*****************************************************************************
 xSemaphoreHandle g_pUARTSemaphore;
 
-//*****************************************************************************
-//
-// The error routine that is called if the driver library encounters an error.
-//
-//*****************************************************************************
-#ifdef DEBUG
-void
-__error__(char *pcFilename, uint32_t ui32Line)
+#define BLOOM_RADIUS 3
+#define FULL_RADIUS_STEP 100
+
+static uint16_t current_color_base = 0;
+static float MAX_RADIUS;
+
+Pixel get_bloom_pixel(int i, int j)
 {
+  Pixel p;
+  uint16_t current_color = current_color_base;
+
+  current_color += (uint16_t) ((hypot((float) i, (float) j) / MAX_RADIUS) * FULL_RADIUS_STEP);
+  current_color = current_color % 768;
+  
+  if(current_color < 256) {
+    p.red = (255 - current_color);
+    p.green = current_color;
+    p.blue = 0;
+  } else if(current_color < 512) {
+    p.red = 0;
+    p.green = (511 - current_color);
+    p.blue = (current_color - 256);
+  } else {
+    p.red = (current_color - 512);
+    p.green = 0;
+    p.blue = 767 - current_color ;
+  }
+
+  return p;
 }
 
-#endif
+void bloom_animation(void)
+{
+  int i, j;
+  Pixel white_pixel;
+  MAX_RADIUS = hypot(BLOOM_RADIUS, BLOOM_RADIUS);
+  current_color_base += 1;
+  white_pixel.red = 255;
+  white_pixel.green = 255;
+  white_pixel.blue = 255;
+
+  if(current_color_base > (256 * 3))
+    current_color_base = 0;
+
+  for(i = 0; i < 32; i++) {
+    int temp = i;
+    
+    for(j = 0; j < 8; j++) {
+      
+      Pixel p;
+      if((i % 6) < 3 && (j % 6) < 3) {
+	p = get_bloom_pixel((i % 3), (j % 3));
+      } else if ((i % 6) >= 3 && (j % 6) < 3) {
+	p = get_bloom_pixel(3 - (i % 3), (j % 3));	
+      } else if ((i % 6) < 3 && (j % 6) >= 3) {
+	p = get_bloom_pixel((i % 3), 3 - (j % 3));	
+      } else {
+	p = get_bloom_pixel(3 - (i % 3), 3 - (j % 3));	
+      }
+
+	frame_buffer[(j * 32) + i] = p;
+    }
+    i = temp;
+  }
+
+  render();
+}
+
+
+//*****************************************************************************
+//*****************************************************************************
+int main(void)
+{
+	Pixel p;
+	int i, j;
+	init_led_display();
+
+	//
+	// Create a mutex to guard the UART.
+	//
+	//g_pUARTSemaphore = xSemaphoreCreateMutex();
+
+	//
+	// Start the scheduler.  This should not return.
+	//
+	//vTaskStartScheduler();
+
+	while(1)
+	{
+	 bloom_animation();
+	 for(i = 0; i < 30000; i++) {
+		// Wait
+	 }
+	}
+}
 
 //*****************************************************************************
 //
@@ -75,64 +151,4 @@ vApplicationStackOverflowHook(xTaskHandle *pxTask, char *pcTaskName)
     while(1)
     {
     }
-}
-
-//*****************************************************************************
-// Configure PA0 and PA1 to be UART pins
-//*****************************************************************************
-void uart0_config_gpio(void)
-{
-   gpio_enable_port(GPIOA_BASE);
-   gpio_config_digital_enable( GPIOA_BASE, PA0 | PA1);
-   gpio_config_alternate_function( GPIOA_BASE, PA0 | PA1);
-   gpio_config_port_control( GPIOA_BASE, GPIO_PCTL_PA0_U0RX | GPIO_PCTL_PA1_U0TX);
-}
-
-
-
-//*****************************************************************************
-//*****************************************************************************
-int 
-main(void)
-{
-  //
-  // Create a mutex to guard the UART.
-  //
-  g_pUARTSemaphore = xSemaphoreCreateMutex();
-  
-  uart0_config_gpio();
-  if(uart_init_115K(UART0_BASE) == false)
-  {
-     while(1)
-     {
-        // Halt the program
-     }
-  }
-  uartTxPoll(UART0_BASE,"\n\r");
-  uartTxPoll(UART0_BASE,"*********************\n\r");
-  uartTxPoll(UART0_BASE,"ECE453 FreeRTOS Demo Test 2\n\r");
-  uartTxPoll(UART0_BASE,"*********************\n\r");
-    
-
- // Start the console task
-  if( ConsoleTaskInit()!= 0)
-  {
-    while(1){};
-  }
-
- // Start the wireless task
-  if( WirelessTaskInit()!= 0)
-  {
-    while(1){};
-  }
-  
-  //
-  // Start the scheduler.  This should not return.
-  //
-  vTaskStartScheduler();
-  
-  while(1)
-  {
-     // Infinite Loop
-  }
 }
