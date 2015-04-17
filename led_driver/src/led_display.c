@@ -24,8 +24,8 @@ void init_led_display_gpio(void)
 {
 	// Enable the pins for LED signal output
 	gpio_port_enable(PORT_B_CGC);
-	gpio_digital_enable(PORT_B, (PIN_0));
-	gpio_pin_direction(PORT_B, DIRECTION_OUTPUT, PIN_0);
+	gpio_digital_enable(PORT_B, (PIN_0 | PIN_1 | PIN_2 | PIN_3 | PIN_4 | PIN_5 | PIN_6 | PIN_7));
+	gpio_pin_direction(PORT_B, DIRECTION_OUTPUT, (PIN_0 | PIN_1 | PIN_2 | PIN_3 | PIN_4 | PIN_5 | PIN_6 | PIN_7));
 	
 	// Change the DIR on the 3v->5v pixel signal buffer to output
 	gpio_port_enable(PORT_D_CGC);
