@@ -23,8 +23,10 @@
 	#define TOUCH_BUFFER_SIZE_BYTES	32
 	extern uint32_t *touch_buffer_read, *touch_buffer_write;
 #else
-	#define TOUCH_INPUT_TOP_DMA_CHANNEL 1
-	#define TOUCH_INPUT_BOTTOM_DMA_CHANNEL 1
+	#define TOUCH_INPUT_TOP_DMA_CHANNEL 	10
+	#define TOUCH_INPUT_BOTTOM_DMA_CHANNEL 	20
+	#define TOUCH_BUFFER_SIZE 		4
+	#define TOUCH_BUFFER_SIZE_BYTES	16
 	extern uint32_t *touch_buffer_top_read, *touch_buffer_bottom_read;
 	extern uint32_t *touch_buffer_top_write, *touch_buffer_bottom_write;
 #endif

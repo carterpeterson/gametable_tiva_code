@@ -10,7 +10,7 @@
 #define ACTIVE_SECTIONS 	8
 #define WIDTH_PIXELS 		32
 
-#define USING_SIMULATOR
+//#define USING_SIMULATOR
 
 #define UART_BAUDRATE 460800
 
