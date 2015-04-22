@@ -25,7 +25,11 @@ typedef struct {
 #include "../drivers/dma.h"
 #include "../drivers/uart.h"
 
-#define FRAME_OUTPUT_DMA_CHANNEL 9
+#ifdef USING_SIMULATOR
+	#define FRAME_OUTPUT_DMA_CHANNEL 9
+#else
+	#define FRAME_OUTPUT_DMA_CHANNEL 1
+#endif
 
 extern Pixel *frame_buffer;		// The buffer being modified
 extern bool pushing_frame;

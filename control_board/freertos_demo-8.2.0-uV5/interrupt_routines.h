@@ -6,8 +6,9 @@
 
 // Project
 #include "app_config.h"
-#include "../drivers/dma.h"
 #include "led_display.h"
+#include "touch_input.h"
+#include "../drivers/dma.h"
 #include "../drivers/i2c.h"
 
 #endif

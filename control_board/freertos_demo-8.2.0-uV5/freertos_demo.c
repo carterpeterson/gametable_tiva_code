@@ -30,6 +30,7 @@
 #include "semphr.h"
 
 #include "led_display.h"
+#include "touch_input.h"
 
 
 //*****************************************************************************
@@ -72,7 +73,7 @@ Pixel get_bloom_pixel(int i, int j)
 
 void bloom_animation(void)
 {
-  int i, j;
+  int i, j, temp;
   Pixel white_pixel;
   MAX_RADIUS = hypot(BLOOM_RADIUS, BLOOM_RADIUS);
   current_color_base += 1;
@@ -84,23 +85,26 @@ void bloom_animation(void)
     current_color_base = 0;
 
   for(i = 0; i < 32; i++) {
-    int temp = i;
+    temp = i;
     
     for(j = 0; j < 8; j++) {
-      
-      Pixel p;
-      if((i % 6) < 3 && (j % 6) < 3) {
-	p = get_bloom_pixel((i % 3), (j % 3));
-      } else if ((i % 6) >= 3 && (j % 6) < 3) {
-	p = get_bloom_pixel(3 - (i % 3), (j % 3));	
-      } else if ((i % 6) < 3 && (j % 6) >= 3) {
-	p = get_bloom_pixel((i % 3), 3 - (j % 3));	
-      } else {
-	p = get_bloom_pixel(3 - (i % 3), 3 - (j % 3));	
-      }
+		Pixel p;
+		if((i % 6) < 3 && (j % 6) < 3) {
+			p = get_bloom_pixel((i % 3), (j % 3));
+		} else if ((i % 6) >= 3 && (j % 6) < 3) {
+			p = get_bloom_pixel(3 - (i % 3), (j % 3));	
+		} else if ((i % 6) < 3 && (j % 6) >= 3) {
+			p = get_bloom_pixel((i % 3), 3 - (j % 3));	
+		} else {
+			p = get_bloom_pixel(3 - (i % 3), 3 - (j % 3));	
+		}
 
-	frame_buffer[(j * 32) + i] = p;
-    }
+		if(is_pixel_touched(i, j)) {
+			set_pixel(i, j, white_pixel);
+		} else {
+			set_pixel(i, j, p);
+		}
+	}
     i = temp;
   }
 
@@ -115,6 +119,7 @@ int main(void)
 	Pixel p;
 	int i, j;
 	init_led_display();
+	init_touch_input();
 
 	//
 	// Create a mutex to guard the UART.
