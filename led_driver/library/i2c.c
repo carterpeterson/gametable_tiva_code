@@ -1,7 +1,7 @@
 #include "i2c.h"
 
 static bool has_stopped = true;
-I2C_channel i2c1 = {0, 0, 0, 0, 0, I2C1};
+I2C_channel i2c1 = {0, 0, 0, 0, I2C1};
 
 bool i2c_enable(uint8_t cgc_mask)
 {
@@ -119,93 +119,9 @@ bool i2c_read_byte(I2C0_Type* i2c, uint8_t *data, bool stop, bool repeat_start)
 	return true;
 }
 
-void i2c_handle_request(I2C_channel *channel, I2C_request *req)
-{	
-	while(channel->busy)
-		; // Wait for channel to open up
-	
-	channel->busy = true;
-	channel->current_request = req;
-	i2c_slave_address_set(channel->channel, req->device_addr);
-	
-	if(req->read_req) {
-		i2c_slave_rw_set(channel->channel, I2C_MSA_SLAVE_READ);
-	} else {
-		i2c_slave_rw_set(channel->channel, I2C_MSA_SLAVE_WRITE);
-		channel->channel->MDR = req->data;
-	}
-	
-	channel->channel->MCS = I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP;
-}
-
-void i2c_continue_request(I2C_channel *channel)
-{
-	channel->current_request = channel->current_request->next_req;
-	i2c_slave_address_set(channel->channel, channel->current_request->device_addr);
-	
-	if(channel->current_request->read_req) {
-		i2c_slave_rw_set(channel->channel, I2C_MSA_SLAVE_READ);
-	} else {
-		i2c_slave_rw_set(channel->channel, I2C_MSA_SLAVE_WRITE);
-		channel->channel->MDR = channel->current_request->data;
-	}
-	
-	channel->channel->MCS = I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP;
-}
-
-void i2c_retry_request(I2C_channel *channel)
-{	
-	if(channel->current_request->read_req) {
-		i2c_slave_rw_set(channel->channel, I2C_MSA_SLAVE_READ);
-	} else {
-		i2c_slave_rw_set(channel->channel, I2C_MSA_SLAVE_WRITE);
-		channel->channel->MDR = channel->current_request->data;
-	}
-	
-	channel->channel->MCS = I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP;
-}
-
-void i2c_handle_response(I2C_channel *channel)
-{
-	if(channel->status & (I2C_MCS_ARB_LOST | I2C_MCS_DATA_ACK | I2C_MCS_ADDR_ACK | I2C_MCS_ERROR)) {
-		
-		if(channel->attempt < MAX_TRIES_I2C) {
-			channel->attempt++;
-			i2c_retry_request(channel);
-		} else {
-			channel->attempt = 0;
-		
-			if(channel->current_request->next_req) {
-				i2c_continue_request(channel);
-			} else {
-				channel->current_request = 0x00;
-				channel->busy = false;
-			}
-		}
-	} else {
-		channel->attempt = 0;
-		
-		if(channel->current_request->read_req) {
-			channel->current_request->data = channel->channel->MDR;
-		}
-		
-		if(channel->current_request->next_req) {
-			i2c_continue_request(channel);
-		} else {
-			i2c1.current_request = 0x00;
-			channel->busy = false;
-		}
-	}
-	
-	channel->update_pending = false;
-}
-
 void I2C1_Handler(void)
 {
 	i2c1.status = I2C1->MCS; // Capture it right away for timing purposes
-	
-	if(i2c1.status & (I2C_MCS_BUSY | I2C_MCS_BUS_BUSY))
-		return;
 		
 	i2c1.update_pending = true;
 		

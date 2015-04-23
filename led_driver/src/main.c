@@ -22,9 +22,7 @@ int main(void)
 {	
 	init_input();
 	init_led_display();
-	//init_capsense();
-	
-	UART0->DR = '!';
+	init_capsense();
 	
 	while(1) {
 		// Do nothing, wait for frame buffer over UART

@@ -63,7 +63,7 @@ void convert_buffer(void)
 	Display_section current_section;
 	uint8_t x_off, y_off, x, y, p, map, bit; 
 	
-	for(s = 0; s < ACTIVE_SECTIONS; s++) {
+	for(s = 0; s < ACTIVE_SECTIONS_LED; s++) {
 		current_section = section_map[s];
 		
 		x_off = (s > 3) ? 16 : 0;

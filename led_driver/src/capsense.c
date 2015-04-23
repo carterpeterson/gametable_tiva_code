@@ -2,22 +2,37 @@
 
 typedef struct {
 	uint8_t device_address;
-	uint8_t sensor_bit_mask;
+	uint8_t bit_0_pixel, bit_1_pixel;
 } Touch_pixel_mapping;
 
 typedef struct {
+	uint8_t current_device;
+	bool complete;
 	I2C_channel *section_channel;
-	Touch_pixel_mapping mappings[PIXELS_PER_TOUCH_SECTION];
+	uint16_t buffers[2];
+	Touch_pixel_mapping mappings[CAPSENSE_CONTROLLERS_PER_SECTION];
 } Touch_section;
 
 static Touch_section section_one = {
+	0x00,
+	false,
 	&i2c1,
-	{{0x20, 0x01}, {0x20, 0x02}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, 
-	{0x21, 0x02}, {0x21, 0x01}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, }
+	{0, 0},
+	{{0x20, 0, 1}, {0x21, 16, 17}, {0x22, 2, 3}, {0x23, 18, 19},
+	{0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}}
 };
+
+static Touch_section touch_sections[ACTIVE_SECTIONS_CAPSENSE];
 
 uint32_t touch_buffers[2][4] = {0};
 uint32_t *touch_read_buffer, *touch_write_buffer;
+
+void init_touch_sections(void)
+{
+	touch_sections[0] = section_one;
+}
 
 void init_capsense_gpio(void)
 {
@@ -40,128 +55,134 @@ void init_capsense_buffers(void)
 	touch_write_buffer = touch_buffers[1];
 }
 
-void display_touches(void)
+bool all_sections_complete(void)
 {
-	Pixel red_p, *temp;
-	int i, j;
+	int i = 0;
+	for(; i < ACTIVE_SECTIONS_CAPSENSE; i++) {
+		if(!touch_sections[i].complete)
+			return false;
+	}
 	
-	red_p.red = 255;
-	
-	write_buffer[0].red = 0;
-	write_buffer[1].red = 0;
-	write_buffer[2].red = 0;
-	write_buffer[3].red = 0;
-	
-	for(i = 0; i < 2; i++) {
-		printf("%d\n\r", touch_read_buffer[i]);
-	
-		for(j = 0; j < 2; j++) {
-			if((touch_read_buffer[i] >> (31 - j)) & 0x01) {
-				if(i == 0 && j == 0) {
-					write_buffer[1] = red_p;
-				} else if(i == 0 && j == 1) {
-					write_buffer[2] = red_p;
-				} else if(i == 1 && j == 0) {
-					write_buffer[0] = red_p;
-				} else if(i == 1 && j == 1) {
-					write_buffer[3] = red_p;
-				}
+	return true;
+}
+
+void transmit_touch_buffer(void)
+{
+	printf(":)\n\r");
+}
+
+void capsense_write(Touch_section section)
+{
+	i2c_slave_address_set(section.section_channel->channel, section.mappings[section.current_device].device_address);
+	i2c_slave_rw_set(section.section_channel->channel, I2C_MSA_SLAVE_WRITE);
+	section.section_channel->channel->MDR = CAPSENSE_PROX_REG_ADDR;
+	section.section_channel->read_req = false;
+	section.section_channel->channel->MCS = I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP;
+}
+
+void capsense_read(Touch_section section)
+{
+	i2c_slave_address_set(section.section_channel->channel, section.mappings[section.current_device].device_address);
+	i2c_slave_rw_set(section.section_channel->channel, I2C_MSA_SLAVE_READ);
+	section.section_channel->read_req = true;
+	section.section_channel->channel->MCS = I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP;
+}
+
+void process_capsense_section(Touch_section section)
+{
+	uint8_t data, pixel;
+
+	if(section.complete || !section.section_channel->update_pending)
+		return;
+		
+	if(section.section_channel->status & (I2C_MCS_ARB_LOST | I2C_MCS_DATA_ACK | I2C_MCS_ADDR_ACK | I2C_MCS_ERROR | I2C_MCS_BUSY | I2C_MCS_BUS_BUSY)) {
+		
+		if(section.section_channel->attempt < MAX_TRIES_I2C) {
+			section.section_channel->attempt++;
+			
+			if(section.section_channel->read_req)
+				capsense_read(section);
+			else
+				capsense_write(section);
+		} else { // Failed request
+			section.section_channel->attempt = 0;
+			section.current_device++;
+			
+			while(section.mappings[section.current_device].device_address == 0x00
+				&& section.current_device < CAPSENSE_CONTROLLERS_PER_SECTION)
+				section.current_device++;
+			
+			if(section.current_device >= CAPSENSE_CONTROLLERS_PER_SECTION) {
+				section.complete = true;
+			} else {
+				capsense_write(section);
 			}
+		}
+	} else {
+		if(section.section_channel->read_req) {
+			// Save off the data
+			data = section.section_channel->channel->MDR;
+			
+			if((data & BIT_0) == BIT_0) {
+				pixel = section.mappings[section.current_device].bit_0_pixel;
+				section.buffers[pixel / 16] |= (0x01 << (15 - (pixel % 16)));
+			}
+			
+			if((data & BIT_1) == BIT_1) {
+				pixel = section.mappings[section.current_device].bit_1_pixel;
+				section.buffers[pixel / 16] |= (0x01 << (15 - (pixel % 16)));
+			}
+			
+			// Start the next section
+			section.current_device++;
+			
+			while(section.mappings[section.current_device].device_address == 0x00
+				&& section.current_device < CAPSENSE_CONTROLLERS_PER_SECTION)
+				section.current_device++;
+			
+			if(section.current_device >= CAPSENSE_CONTROLLERS_PER_SECTION) {
+				section.complete = true;
+			} else {
+				capsense_write(section);
+			}
+		} else {
+			capsense_read(section);
 		}
 	}
 	
-	temp = write_buffer;
-	write_buffer = read_buffer;
-	read_buffer = temp;
-		
-	convert_buffer();
+	section.section_channel->update_pending = false;
+}
+
+void reset_touch_sections(void)
+{
+	int i = 0;
+	for(; i < ACTIVE_SECTIONS_CAPSENSE; i++) {
+		touch_sections[i].complete = false;
+		touch_sections[i].buffers[0] = 0;
+		touch_sections[i].buffers[1] = 0;
+		touch_sections[i].current_device = 0;
+		touch_sections[i].section_channel->attempt = 0;
+		capsense_write(touch_sections[i]);
+	}
 }
 
 void init_capsense(void)
-{
-	uint32_t *temp;
-	int wait, i;
-	uint8_t sensor_data;
-	I2C_request write_req_0, read_req_0, write_req_1, read_req_1, *cur_parse_req;
-	
+{	
+	int i;
+
 	init_capsense_gpio();
 	init_capsense_i2c();
 	init_capsense_buffers();
-	
-	write_req_0.read_req = false;
-	write_req_0.complete = false;
-	write_req_0.dependent = false;
-	write_req_0.device_addr = 0x20;
-	write_req_0.data = 0xAE;
-	write_req_0.size = 1;
-	write_req_0.next_req = &read_req_0;
-	
-	read_req_0.read_req = true;
-	read_req_0.complete = false;
-	read_req_0.dependent = true;
-	read_req_0.device_addr = 0x20;
-	read_req_0.data = 0;
-	read_req_0.size = 1;
-	read_req_0.next_req = &write_req_1;
-	
-	write_req_1.read_req = false;
-	write_req_1.complete = false;
-	write_req_1.dependent = false;
-	write_req_1.device_addr = 0x21;
-	write_req_1.data = 0xAE;
-	write_req_1.size = 1;
-	write_req_1.next_req = &read_req_1;
-	
-	read_req_1.read_req = true;
-	read_req_1.complete = false;
-	read_req_1.dependent = true;
-	read_req_1.device_addr = 0x21;
-	read_req_1.data = 0;
-	read_req_1.size = 1;
-	read_req_1.next_req = NULL;//&write_req_1;
-	
-	i2c_handle_request(&i2c1, &write_req_0);
+	reset_touch_sections();
 	
 	while(1) {
-		if(i2c1.update_pending) {
-			i2c_handle_response(&i2c1);
-		} else if (i2c1.busy == false) {
-			wait = 0;
-			while(wait < 3000)
-				wait++;
-				
-			touch_write_buffer[0] = 0;
-			touch_write_buffer[1] = 0;
-				
-			for(i = 0; i < PIXELS_PER_TOUCH_SECTION; i++) {
-				
-				cur_parse_req = &read_req_0;
-				
-				if(section_one.mappings[i].device_address != 0x00) {
-				
-					while((section_one.mappings[i].device_address != cur_parse_req->device_addr || !cur_parse_req->read_req)
-							&& cur_parse_req->next_req != NULL) {
-							cur_parse_req = cur_parse_req->next_req;
-					}
-
-					if(cur_parse_req->device_addr == section_one.mappings[i].device_address
-						&& cur_parse_req->read_req) {
-					
-						sensor_data = (section_one.mappings[i].sensor_bit_mask & cur_parse_req->data) ? 0x1 : 0x0;
-						touch_write_buffer[i / 16] |= (sensor_data << (31 - (i % 16)));
-					}
-				}
+		if(all_sections_complete()) {
+			transmit_touch_buffer();
+			reset_touch_sections();
+		} else {
+			for(i = 0; i < ACTIVE_SECTIONS_CAPSENSE; i++) {
+				process_capsense_section(touch_sections[i]);
 			}
-			
-			temp = touch_read_buffer;
-			touch_read_buffer = touch_write_buffer;
-			touch_write_buffer = temp;
-				
-			display_touches();	
-				
-			read_req_0.data = 0;
-			read_req_1.data = 0;
-			i2c_handle_request(&i2c1, &write_req_0);
 		}
 	}
 }

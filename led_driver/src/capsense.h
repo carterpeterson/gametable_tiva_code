@@ -14,10 +14,12 @@
 #include "../library/gpio.h"
 #include "../library/i2c.h"
 
-#define PIXELS_PER_TOUCH_SECTION 	32
+#define PIXELS_PER_TOUCH_SECTION 			32
+#define CAPSENSE_CONTROLLERS_PER_SECTION 	16
+#define CAPSENSE_PROX_REG_ADDR				0xAE
 
-
-extern uint32_t *touch_read_buffer;
+#define BIT_0 0x01
+#define BIT_1 0x02
 
 void init_capsense(void);
 

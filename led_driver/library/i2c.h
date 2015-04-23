@@ -17,22 +17,11 @@
 *		I2C related defines
 */
 
-typedef struct i2c_req_t {
-	bool read_req;
-	bool complete;
-	bool dependent;
-	uint8_t device_addr;
-	uint8_t	data;
-	uint32_t size;
-	struct i2c_req_t* next_req;
-} I2C_request;
-
 typedef struct {
-	bool busy;
 	bool update_pending;
+	bool read_req;
 	uint8_t attempt;
 	uint8_t status;
-	I2C_request* current_request;
 	I2C0_Type* channel;
 }	I2C_channel;
 
@@ -89,7 +78,7 @@ void i2c_slave_address_set(I2C0_Type* i2c, uint8_t addr);
 void i2c_slave_rw_set(I2C0_Type* i2c, uint8_t rw_mask);
 bool i2c_send_byte(I2C0_Type* i2c, uint8_t data, bool stop, bool repeat_start);
 bool i2c_read_byte(I2C0_Type* i2c, uint8_t *data, bool stop, bool repeat_start);
-void i2c_handle_request(I2C_channel *channel, I2C_request *req);
+//void i2c_handle_request(I2C_channel *channel, I2C_request *req);
 void i2c_retry_request(I2C_channel *channel);
 void i2c_handle_response(I2C_channel *channel);
 
