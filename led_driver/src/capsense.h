@@ -21,6 +21,15 @@
 #define BIT_0 0x01
 #define BIT_1 0x02
 
+#define TOUCH_BUFFER_SIZE				4
+#define TOUCH_BUFFER_MINUS_ONE 			15
+
+#ifdef USING_SIMULATOR
+	#define CAPSENSE_OUTPUT_DMA_CHANNEL 9
+#else
+	#define CAPSENSE_OUTPUT_DMA_CHANNEL 1
+#endif
+
 void init_capsense(void);
 
 #endif
