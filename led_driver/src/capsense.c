@@ -28,10 +28,21 @@ bool pushing_uart = false;
 
 void init_capsense_gpio(void)
 {
+	// I2C1
 	gpio_digital_enable(PORT_A, (PIN_6 | PIN_7));
 	gpio_alternate_function_enable(PORT_A, (PIN_6 | PIN_7));
 	gpio_config_port_ctl(PORT_A, (PIN_6 | PIN_7), 3);
 	gpio_open_drain_enable(PORT_A, PIN_7);
+	
+	#ifndef USING_SIMULATOR
+		// UART 7
+		gpio_port_enable(PORT_E_CGC);
+		gpio_digital_enable(PORT_E, (PIN_0 | PIN_1));
+		gpio_pin_direction(PORT_E, DIRECTION_OUTPUT, PIN_1);
+		gpio_pin_direction(PORT_E, DIRECTION_INPUT, PIN_0);
+		gpio_alternate_function_enable(PORT_E, (PIN_0 | PIN_1));
+		gpio_config_port_ctl(PORT_E, (PIN_0 | PIN_1), 1);
+	#endif
 }
 
 void init_capsense_i2c(void)
@@ -48,6 +59,21 @@ void init_capsense_buffers(void)
 	touch_write_buffer = touch_buffers[1];
 }
 
+void init_capsense_uart(void)
+{
+	#ifndef USING_SIMULATOR
+		uart_clock_enable(UART7_CGC);
+		uart_channel_disable(UART7);
+		uart_config_baud(UART7, 460800);
+		uart_config_line_control(UART7, (UART_CTL_WORD_LENGTH_8 | UART_LCRH_FEN));
+		uart_config_dma(UART7, UART_DMACTL_RX_EN | UART_DMACTL_TX_EN);
+		uart_enable_interrupts(UART7, 1);
+		uart_channel_enable(UART7, UART_CTL_ENABLE | UART_CTL_RX_ENABLE | UART_CTL_TX_ENABLE);
+		UART7->IFLS = 0;
+		UART7->IFLS |= 0x13;
+	#endif
+}
+
 void queue_touch_buffer_dma(void)
 {
 	DMA_control touch_buffer_tx_req;
@@ -56,8 +82,8 @@ void queue_touch_buffer_dma(void)
 	#ifdef USING_SIMULATOR
 		touch_buffer_tx_req.destination = (void*) &(UART0->DR);
 	#else
-		// THIS IS ALSO WRONG FUCK CARTER U SUK
-		touch_buffer_tx_req.destination = (void*) &(UART2->DR);
+		// THIS IS ALSO RIGHT FUCK CARTER U RULE
+		touch_buffer_tx_req.destination = (void*) &(UART7->DR);
 	#endif
 	touch_buffer_tx_req.control = (DMA_DSTINC_NONE | \
 	DMA_DSTSIZE_BYTE | DMA_SRCINC_BYTE | DMA_SRCSIZE_BYTE | \
@@ -80,9 +106,9 @@ void init_capsense_dma(void)
 	#ifdef USING_SIMULATOR
 		UDMA->CHMAP1 &= ~(0xF0);
 	#else
-		// THIS IS WRONG FOR NOW! DON'T USE UART2 for CAPSENSE
-		UDMA->CHMAP0 &= ~(0xF0);
-		UDMA->CHMAP0 |= (0x10);
+		// THIS SEEMS RIGHT FOR NOW
+		UDMA->CHMAP2 &= ~(0x00F00000);
+		UDMA->CHMAP2 |= (0x00200000);
 	#endif
 }
 
@@ -222,6 +248,7 @@ void init_capsense(void)
 	int i;
 
 	init_capsense_gpio();
+	init_capsense_uart();
 	init_capsense_i2c();
 	init_capsense_buffers();
 	init_capsense_dma();

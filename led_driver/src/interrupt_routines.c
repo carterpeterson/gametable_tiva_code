@@ -56,4 +56,15 @@
 			convert_buffer();
 		}
 	}
+	
+	void UART7_Handler(void)
+	{
+		uint32_t  status;
+		status = UDMA->CHIS;
+		
+		if((status & (0x01 << CAPSENSE_OUTPUT_DMA_CHANNEL)) == (0x01 << CAPSENSE_OUTPUT_DMA_CHANNEL)){
+			pushing_uart = false;
+			UDMA->CHIS |= (0x01 << CAPSENSE_OUTPUT_DMA_CHANNEL); // Clear
+		}
+	}
 #endif

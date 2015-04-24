@@ -13,6 +13,6 @@
 #define ACTIVE_SECTIONS_CAPSENSE 	1
 #define WIDTH_PIXELS 		32
 
-#define USING_SIMULATOR
+//#define USING_SIMULATOR
 
 #endif

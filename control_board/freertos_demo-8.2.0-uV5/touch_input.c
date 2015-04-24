@@ -1,6 +1,6 @@
 #include "touch_input.h"
 
-#ifdef USING_SIMULATOR
+#ifdef USING_SIMULATOR_TOUCH
 	uint32_t touch_buffers[2][8];
 	uint32_t *touch_buffer_read, *touch_buffer_write;
 #else
@@ -11,7 +11,7 @@
 
 void init_touch_buffers(void)
 {
-	#ifdef USING_SIMULATOR
+	#ifdef USING_SIMULATOR_TOUCH
 		touch_buffer_read = touch_buffers[0];
 		touch_buffer_write = touch_buffers[1];
 	#else
@@ -24,7 +24,7 @@ void init_touch_buffers(void)
 
 void init_touch_input_gpio(void)
 {
-	#ifdef USING_SIMULATOR
+	#ifdef USING_SIMULATOR_TOUCH
 		// Was setup during the led_display setup,
 		// as this also will use UART0
 	#else
@@ -48,7 +48,7 @@ void init_touch_input_gpio(void)
 
 void init_touch_input_dma(void)
 {
-	#ifdef USING_SIMULATOR
+	#ifdef USING_SIMULATOR_TOUCH
 		DMA_control touch_input_rx_req;
 		
 		dma_enable();
@@ -106,7 +106,7 @@ void init_touch_input_dma(void)
 
 void init_touch_input_uart(void)
 {
-	#ifdef USING_SIMULATOR
+	#ifdef USING_SIMULATOR_TOUCH
 		uart_config_dma(UART0, UART_DMACTL_RX_EN);
 		UART0->IFLS &= (~0xF0);
 		UART0->IFLS |= 0x10;
@@ -145,7 +145,7 @@ void init_touch_input(void)
 
 bool is_pixel_touched(uint8_t i, uint8_t j)
 {
-	#ifdef USING_SIMULATOR
+	#ifdef USING_SIMULATOR_TOUCH
 		if ((touch_buffer_read[j] & (0x01 << (31 - i))) != 0) 
 			return true;
 	#else

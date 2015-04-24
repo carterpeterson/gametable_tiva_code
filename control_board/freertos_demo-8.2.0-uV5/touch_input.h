@@ -17,7 +17,7 @@
 #include "../drivers/dma.h"
 #include "../drivers/uart.h"
 
-#ifdef USING_SIMULATOR
+#ifdef USING_SIMULATOR_TOUCH
 	#define TOUCH_INPUT_DMA_CHANNEL 8
 	#define TOUCH_BUFFER_SIZE 		8
 	#define TOUCH_BUFFER_SIZE_BYTES	32

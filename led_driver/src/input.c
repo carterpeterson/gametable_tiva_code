@@ -66,7 +66,6 @@ void init_input_gpio(void)
 
 void init_input_uart(void)
 {
-	
 	uart_clock_enable(UART0_CGC);
 	uart_channel_disable(UART0);
 	uart_config_baud(UART0, 460800);
