@@ -31,5 +31,6 @@
 #endif
 
 void init_capsense(void);
+extern bool pushing_uart;
 
 #endif

@@ -8,6 +8,7 @@
 #include "app_config.h"
 #include "../library/dma.h"
 #include "led_display.h"
+#include "capsense.h"
 #include "../library/i2c.h"
 
 #endif

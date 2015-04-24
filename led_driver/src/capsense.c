@@ -16,7 +16,7 @@ typedef struct {
 static Touch_section touch_sections[ACTIVE_SECTIONS_CAPSENSE] =
 {
 	{0x00, false, &i2c1, {0, 0},
-	{{0x20, 0, 1}, {0x21, 16, 17}, {0x22, 2, 3}, {0x23, 18, 19},
+	{{0x24, 12, 13}, {0x25, 16, 17}, {0x22, 2, 3}, {0x23, 18, 19},
 		{0}, {0}, {0}, {0},
 		{0}, {0}, {0}, {0},
 		{0}, {0}, {0}, {0}}}
@@ -24,6 +24,7 @@ static Touch_section touch_sections[ACTIVE_SECTIONS_CAPSENSE] =
 
 uint32_t touch_buffers[2][TOUCH_BUFFER_SIZE] = {0};
 uint32_t *touch_read_buffer, *touch_write_buffer;
+bool pushing_uart = false;
 
 void init_capsense_gpio(void)
 {
@@ -36,6 +37,7 @@ void init_capsense_gpio(void)
 void init_capsense_i2c(void)
 {
 	i2c_enable(I2C1_CGC);
+	i2c_config_speed(I2C1, I2C_TIMER_PERIOD_400K);
 	i2c_init_master(I2C1);
 	i2c_master_interrupt_enable(I2C1, 1);
 }
@@ -97,6 +99,7 @@ bool all_sections_complete(void)
 
 void transmit_touch_buffer(void)
 {
+	int i;
 	uint32_t *temp;
 
 	touch_write_buffer[0] = 0;
@@ -109,7 +112,13 @@ void transmit_touch_buffer(void)
 	touch_read_buffer = touch_write_buffer;
 	touch_write_buffer = temp;
 	
-	queue_touch_buffer_dma();
+	if(!pushing_uart) {
+		pushing_uart = true;
+		for(i = 0; i < 250000; i++) {
+			// wait
+		}
+		queue_touch_buffer_dma();
+	}
 }
 
 void capsense_write(Touch_section *section)
@@ -136,7 +145,7 @@ void process_capsense_section(Touch_section *section)
 	if(section->complete || !section->section_channel->update_pending)
 		return;
 		
-	if(section->section_channel->status & (I2C_MCS_ARB_LOST | I2C_MCS_DATA_ACK | I2C_MCS_ADDR_ACK | I2C_MCS_ERROR | I2C_MCS_BUSY | I2C_MCS_BUS_BUSY)) {
+	if(section->section_channel->status & (I2C_MCS_ARB_LOST | I2C_MCS_DATA_ACK | I2C_MCS_ADDR_ACK | I2C_MCS_ERROR)) {
 		
 		if(section->section_channel->attempt < MAX_TRIES_I2C) {
 			section->section_channel->attempt++;
@@ -202,6 +211,7 @@ void reset_touch_sections(void)
 		touch_sections[i].buffers[0] = 0;
 		touch_sections[i].buffers[1] = 0;
 		touch_sections[i].current_device = 0;
+		touch_sections[i].section_channel->update_pending = false;
 		touch_sections[i].section_channel->attempt = 0;
 		capsense_write(&touch_sections[i]);
 	}

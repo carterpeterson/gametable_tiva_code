@@ -25,6 +25,9 @@
 			UDMA->CHIS |= (0x01 << 8); // Clear
 		
 			convert_buffer();
+		} else if((status & (0x01 << CAPSENSE_OUTPUT_DMA_CHANNEL)) == (0x01 << CAPSENSE_OUTPUT_DMA_CHANNEL)){
+			pushing_uart = false;
+			UDMA->CHIS |= (0x01 << CAPSENSE_OUTPUT_DMA_CHANNEL); // Clear
 		}
 	}
 #else

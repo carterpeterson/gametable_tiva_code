@@ -6,6 +6,6 @@
 
 #define SYSTEM_CLOCK_RATE 80000000
 
-#define MAX_TRIES_I2C		5
+#define MAX_TRIES_I2C		3
 
 #endif

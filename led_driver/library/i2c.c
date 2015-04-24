@@ -122,6 +122,9 @@ bool i2c_read_byte(I2C0_Type* i2c, uint8_t *data, bool stop, bool repeat_start)
 void I2C1_Handler(void)
 {
 	i2c1.status = I2C1->MCS; // Capture it right away for timing purposes
+	
+	if(i2c1.status & (I2C_MCS_BUSY | I2C_MCS_BUS_BUSY))
+		return;
 		
 	i2c1.update_pending = true;
 		
