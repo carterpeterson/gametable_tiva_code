@@ -27,7 +27,7 @@
 #ifdef USING_SIMULATOR
 	#define CAPSENSE_OUTPUT_DMA_CHANNEL 9
 #else
-	#define CAPSENSE_OUTPUT_DMA_CHANNEL 21
+	#define CAPSENSE_OUTPUT_DMA_CHANNEL 1
 #endif
 
 void init_capsense(void);

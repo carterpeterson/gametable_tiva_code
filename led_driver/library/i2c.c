@@ -1,7 +1,10 @@
 #include "i2c.h"
 
 static bool has_stopped = true;
+I2C_channel i2c0 = {0, 0, 0, 0, I2C0};
 I2C_channel i2c1 = {0, 0, 0, 0, I2C1};
+I2C_channel i2c2 = {0, 0, 0, 0, I2C2};
+I2C_channel i2c3 = {0, 0, 0, 0, I2C3};
 
 bool i2c_enable(uint8_t cgc_mask)
 {
@@ -119,6 +122,18 @@ bool i2c_read_byte(I2C0_Type* i2c, uint8_t *data, bool stop, bool repeat_start)
 	return true;
 }
 
+void I2C0_Handler(void)
+{
+	i2c0.status = I2C0->MCS; // Capture it right away for timing purposes
+	
+	if(i2c0.status & (I2C_MCS_BUSY | I2C_MCS_BUS_BUSY))
+		return;
+		
+	i2c0.update_pending = true;
+		
+	I2C0->MICR = 0x01;	// Clear
+}
+
 void I2C1_Handler(void)
 {
 	i2c1.status = I2C1->MCS; // Capture it right away for timing purposes
@@ -129,4 +144,28 @@ void I2C1_Handler(void)
 	i2c1.update_pending = true;
 		
 	I2C1->MICR = 0x01;	// Clear
+}
+
+void I2C2_Handler(void)
+{
+	i2c2.status = I2C2->MCS; // Capture it right away for timing purposes
+	
+	if(i2c2.status & (I2C_MCS_BUSY | I2C_MCS_BUS_BUSY))
+		return;
+		
+	i2c2.update_pending = true;
+		
+	I2C2->MICR = 0x01;	// Clear
+}
+
+void I2C3_Handler(void)
+{
+	i2c3.status = I2C3->MCS; // Capture it right away for timing purposes
+	
+	if(i2c3.status & (I2C_MCS_BUSY | I2C_MCS_BUS_BUSY))
+		return;
+		
+	i2c3.update_pending = true;
+		
+	I2C3->MICR = 0x01;	// Clear
 }

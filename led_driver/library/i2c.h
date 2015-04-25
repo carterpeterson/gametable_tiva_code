@@ -25,7 +25,7 @@ typedef struct {
 	I2C0_Type* channel;
 }	I2C_channel;
 
-extern I2C_channel i2c1;
+extern I2C_channel i2c0, i2c1, i2c2, i2c3;
 
 //	Clock Gating
 #define I2C0_CGC		0x01
