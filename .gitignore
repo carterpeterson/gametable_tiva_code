@@ -50,8 +50,3 @@
 *.l2p
 *.iex
 .#*
-*.uvgui.*
-*.uvguix.*
-*.uvopt
-*.uvoptx
-*.uvprojx

@@ -74,12 +74,16 @@ Pixel get_bloom_pixel(int i, int j)
 void bloom_animation(void)
 {
   int i, j, temp;
-  Pixel white_pixel;
+  Pixel white_pixel, black_pixel;
   MAX_RADIUS = hypot(BLOOM_RADIUS, BLOOM_RADIUS);
   current_color_base += 1;
   white_pixel.red = 255;
-  white_pixel.green = 255;
-  white_pixel.blue = 255;
+  white_pixel.green = 0;
+  white_pixel.blue = 0;
+  
+  black_pixel.red = 0;
+  black_pixel.green = 0;
+  black_pixel.blue = 0;
 
   if(current_color_base > (256 * 3))
     current_color_base = 0;
@@ -102,7 +106,7 @@ void bloom_animation(void)
 		if(is_pixel_touched(i, j)) {
 			set_pixel(i, j, white_pixel);
 		} else {
-			set_pixel(i, j, p);
+			set_pixel(i, j, black_pixel);
 		}
 	}
     i = temp;
@@ -120,6 +124,11 @@ int main(void)
 	int i, j;
 	init_led_display();
 	init_touch_input();
+
+	// Wait for LED board to be up and running
+	for(i = 0; i < 50000000; i++) {
+	
+	}
 
 	//
 	// Create a mutex to guard the UART.
