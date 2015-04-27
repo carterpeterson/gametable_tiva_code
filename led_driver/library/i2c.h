@@ -69,6 +69,15 @@ extern I2C_channel i2c0, i2c1, i2c2, i2c3;
 #define	I2C_MCS_START					0x02
 #define	I2C_MCS_RUN						0x01
 
+// Interrupt Status
+#define I2C_MRIS_CLOCK_TO			0x02
+#define I2C_MRIS_MASTER				0x01
+
+// Interrupt Clears
+#define I2C_MICR_CLOCK_TO			0x02
+#define I2C_MICR_MASTER				0x01
+
+
 bool i2c_enable(uint8_t cgc_mask);
 void i2c_init_master(I2C0_Type* i2c);
 void i2c_init_slave(I2C0_Type* i2c);
@@ -78,7 +87,8 @@ void i2c_slave_address_set(I2C0_Type* i2c, uint8_t addr);
 void i2c_slave_rw_set(I2C0_Type* i2c, uint8_t rw_mask);
 bool i2c_send_byte(I2C0_Type* i2c, uint8_t data, bool stop, bool repeat_start);
 bool i2c_read_byte(I2C0_Type* i2c, uint8_t *data, bool stop, bool repeat_start);
-//void i2c_handle_request(I2C_channel *channel, I2C_request *req);
+void i2c_clock_low_timout_set(I2C0_Type* i2c, uint8_t timeout);
+void i2c_clock_timeout_interrupt_enable(I2C0_Type* i2c, uint8_t priority);
 void i2c_retry_request(I2C_channel *channel);
 void i2c_handle_response(I2C_channel *channel);
 

@@ -96,7 +96,8 @@
 	void UART6_Handler(void)
 	{
 		DMA_control touch_input_rx_req;
-		uint32_t  status, *temp;
+		uint32_t status;
+		uint8_t *temp;
 		status = UDMA->CHIS;
 		
 		if((status & (0x01 << TOUCH_INPUT_TOP_DMA_CHANNEL)) == (0x01 << TOUCH_INPUT_TOP_DMA_CHANNEL)){		
@@ -107,7 +108,7 @@
 			touch_buffer_top_read = temp;
 
 			touch_input_rx_req.source = (void*) &(UART6->DR);
-			touch_input_rx_req.destination = (void*) (((uint32_t) &(touch_buffer_top_write[TOUCH_BUFFER_SIZE])) - 1);
+			touch_input_rx_req.destination = &(touch_buffer_top_write[TOUCH_BUFFER_SIZE_BYTES - 1]);
 			touch_input_rx_req.control = (DMA_DSTINC_BYTE | \
 			DMA_DSTSIZE_BYTE | DMA_SRCINC_NONE | DMA_SRCSIZE_BYTE | \
 			DMA_ARBSIZE_2 | ((TOUCH_BUFFER_SIZE_BYTES - 1) << 4) | DMA_XFERMODE_BASIC);
@@ -119,7 +120,8 @@
 	void UART7_Handler(void)
 	{
 		DMA_control touch_input_rx_req;
-		uint32_t  status, *temp;
+		uint32_t status;
+		uint8_t *temp;
 		status = UDMA->CHIS;
 		
 		if((status & (0x01 << TOUCH_INPUT_BOTTOM_DMA_CHANNEL)) == (0x01 << TOUCH_INPUT_BOTTOM_DMA_CHANNEL)){		
@@ -130,7 +132,7 @@
 			touch_buffer_bottom_read = temp;
 
 			touch_input_rx_req.source = (void*) &(UART7->DR);
-			touch_input_rx_req.destination = (void*) (((uint32_t) &(touch_buffer_bottom_write[TOUCH_BUFFER_SIZE])) - 1);
+			touch_input_rx_req.destination = &(touch_buffer_bottom_write[TOUCH_BUFFER_SIZE_BYTES - 1]);
 			touch_input_rx_req.control = (DMA_DSTINC_BYTE | \
 			DMA_DSTSIZE_BYTE | DMA_SRCINC_NONE | DMA_SRCSIZE_BYTE | \
 			DMA_ARBSIZE_2 | ((TOUCH_BUFFER_SIZE_BYTES - 1) << 4) | DMA_XFERMODE_BASIC);

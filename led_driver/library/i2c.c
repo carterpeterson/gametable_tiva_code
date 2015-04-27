@@ -56,7 +56,33 @@ void i2c_master_interrupt_enable(I2C0_Type* i2c, uint8_t priority)
 		return;
 	}
 	
-	i2c->MIMR = 0x01;
+	i2c->MIMR |= 0x01;
+	NVIC_SetPriority(interrupt_vector, priority);
+	NVIC_EnableIRQ(interrupt_vector);
+}
+
+void i2c_clock_timeout_interrupt_enable(I2C0_Type* i2c, uint8_t priority)
+{
+	IRQn_Type interrupt_vector;
+	
+	switch((uint32_t) i2c) {
+	case(I2C0_BASE):
+		interrupt_vector = I2C0_IRQn;
+		break;
+	case(I2C1_BASE):
+		interrupt_vector = I2C1_IRQn;
+		break;
+	case(I2C2_BASE):
+		interrupt_vector = I2C2_IRQn;
+		break;
+	case(I2C3_BASE):
+		interrupt_vector = I2C3_IRQn;
+		break;
+	default:
+		return;
+	}
+	
+	i2c->MIMR |= 0x02;
 	NVIC_SetPriority(interrupt_vector, priority);
 	NVIC_EnableIRQ(interrupt_vector);
 }
@@ -72,6 +98,11 @@ void i2c_slave_rw_set(I2C0_Type* i2c, uint8_t rw_mask)
 {
 	i2c->MSA &= ~(I2C_MSA_RW_MASK);
 	i2c->MSA |= rw_mask;
+}
+
+void i2c_clock_low_timout_set(I2C0_Type* i2c, uint8_t timeout)
+{
+	i2c->MCLKOCNT = timeout;
 }
 
 bool i2c_send_byte(I2C0_Type* i2c, uint8_t data, bool stop, bool repeat_start)
@@ -126,12 +157,19 @@ void I2C0_Handler(void)
 {
 	i2c0.status = I2C0->MCS; // Capture it right away for timing purposes
 	
-	if(i2c0.status & (I2C_MCS_BUSY | I2C_MCS_BUS_BUSY))
-		return;
+	if((I2C0->MRIS & I2C_MRIS_CLOCK_TO) == I2C_MRIS_CLOCK_TO) {
+		// Clock timed out, force a stop condition on the I2C line
+		I2C0->MCS = I2C_MCS_STOP;
+		I2C0->MICR |= I2C_MICR_CLOCK_TO;	// Clear interrupt
 		
-	i2c0.update_pending = true;
+	} else if ((I2C0->MRIS & I2C_MRIS_MASTER) == I2C_MRIS_MASTER) {
+		if(i2c0.status & (I2C_MCS_BUSY | I2C_MCS_BUS_BUSY))
+			return;
 		
-	I2C0->MICR = 0x01;	// Clear
+		i2c0.update_pending = true;
+		
+		I2C0->MICR |= I2C_MICR_MASTER;	// Clear
+	}
 }
 
 void I2C1_Handler(void)

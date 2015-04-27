@@ -4,9 +4,9 @@
 	uint32_t touch_buffers[2][8];
 	uint32_t *touch_buffer_read, *touch_buffer_write;
 #else
-	uint32_t touch_buffers[2][2][4];
-	uint32_t *touch_buffer_top_read, *touch_buffer_bottom_read;
-	uint32_t *touch_buffer_top_write, *touch_buffer_bottom_write;
+	uint8_t touch_buffers[2][2][TOUCH_BUFFER_SIZE_BYTES];
+	uint8_t *touch_buffer_top_read, *touch_buffer_bottom_read;
+	uint8_t *touch_buffer_top_write, *touch_buffer_bottom_write;
 #endif
 
 void init_touch_buffers(void)
@@ -80,7 +80,7 @@ void init_touch_input_dma(void)
 		UDMA->CHMAP1 &= ~(0x0F00);
 		UDMA->CHMAP1 |= 0x0200;
 		touch_input_top_rx_req.source = (void*) &(UART6->DR);
-		touch_input_top_rx_req.destination = (void*) (((uint32_t) &(touch_buffer_top_write[TOUCH_BUFFER_SIZE])) - 1);
+		touch_input_top_rx_req.destination = &(touch_buffer_top_write[TOUCH_BUFFER_SIZE_BYTES - 1]);
 		touch_input_top_rx_req.control = (DMA_DSTINC_BYTE | \
 		DMA_DSTSIZE_BYTE | DMA_SRCINC_NONE | DMA_SRCSIZE_BYTE | \
 		DMA_ARBSIZE_2 | ((TOUCH_BUFFER_SIZE_BYTES - 1) << 4) | DMA_XFERMODE_BASIC);
@@ -95,7 +95,7 @@ void init_touch_input_dma(void)
 		UDMA->CHMAP2 &= ~(0x000F0000);
 		UDMA->CHMAP2 |= 0x00020000;
 		touch_input_bottom_rx_req.source = (void*) &(UART7->DR);
-		touch_input_bottom_rx_req.destination = (void*) (((uint32_t) &(touch_buffer_bottom_write[TOUCH_BUFFER_SIZE])) - 1);
+		touch_input_bottom_rx_req.destination = &(touch_buffer_bottom_write[TOUCH_BUFFER_SIZE_BYTES - 1]);
 		touch_input_bottom_rx_req.control = (DMA_DSTINC_BYTE | \
 		DMA_DSTSIZE_BYTE | DMA_SRCINC_NONE | DMA_SRCSIZE_BYTE | \
 		DMA_ARBSIZE_2 | ((TOUCH_BUFFER_SIZE_BYTES - 1) << 4) | DMA_XFERMODE_BASIC);
@@ -145,16 +145,22 @@ void init_touch_input(void)
 
 bool is_pixel_touched(uint8_t i, uint8_t j)
 {
+	uint8_t index;
+
 	#ifdef USING_SIMULATOR_TOUCH
 		if ((touch_buffer_read[j] & (0x01 << (31 - i))) != 0) 
 			return true;
 	#else
 		if(j <= 3) {
-			if ((touch_buffer_top_read[j] & (0x01 << (31 - i))) != 0) 
+			//if ((touch_buffer_top_read[j] & (0x01 << (31 - i))) != 0) 
+			//	return true;
+			index = (j * 4) + (3 - (i / 8));
+			if((touch_buffer_top_read[((j * 4) + (3 - (i / 8))) + 1] & (0x01 << (7 -(i % 8)))) != 0) 
 				return true;
+			
 		} else {
-			if ((touch_buffer_bottom_read[j - 4] & (0x01 << (31 - i))) != 0) 
-				return true;
+/*			if ((touch_buffer_bottom_read[j - 4] & (0x01 << (31 - i))) != 0) 
+				return true;*/
 		}
 	#endif
 	

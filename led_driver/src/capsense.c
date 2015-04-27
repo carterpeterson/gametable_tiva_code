@@ -109,10 +109,18 @@ void init_capsense_i2c(void)
 	i2c_config_speed(I2C1, I2C_TIMER_PERIOD_100K);
 	i2c_config_speed(I2C2, I2C_TIMER_PERIOD_100K);
 	i2c_config_speed(I2C3, I2C_TIMER_PERIOD_100K);
+	i2c_clock_low_timout_set(I2C0, I2C_CLOCK_LOW_TIMEOUT);
+	i2c_clock_low_timout_set(I2C1, I2C_CLOCK_LOW_TIMEOUT);
+	i2c_clock_low_timout_set(I2C2, I2C_CLOCK_LOW_TIMEOUT);
+	i2c_clock_low_timout_set(I2C3, I2C_CLOCK_LOW_TIMEOUT);
 	i2c_master_interrupt_enable(I2C0, 4);
 	i2c_master_interrupt_enable(I2C1, 4);
 	i2c_master_interrupt_enable(I2C2, 4);
 	i2c_master_interrupt_enable(I2C3, 4);
+	i2c_clock_timeout_interrupt_enable(I2C0, 4);
+	i2c_clock_timeout_interrupt_enable(I2C1, 4);
+	i2c_clock_timeout_interrupt_enable(I2C2, 4);
+	i2c_clock_timeout_interrupt_enable(I2C3, 4);
 }
 
 void init_capsense_buffers(void)

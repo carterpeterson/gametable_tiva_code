@@ -20,10 +20,11 @@
 
 int main(void)
 {	
+	
 	#ifndef LED_BOARD
 		int i;
 		// Wait for LED board to be up and running
-		for(i = 0; i < 160000000; i++) {}
+		//for(i = 0; i < 160000000; i++) {}
 	#endif
 	
 

@@ -126,9 +126,9 @@ int main(void)
 	init_touch_input();
 
 	// Wait for LED board to be up and running
-	for(i = 0; i < 50000000; i++) {
+	/*for(i = 0; i < 50000000; i++) {
 	
-	}
+	}*/
 
 	//
 	// Create a mutex to guard the UART.
