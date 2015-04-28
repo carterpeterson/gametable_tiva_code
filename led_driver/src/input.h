@@ -14,6 +14,8 @@
 extern Pixel *read_buffer;
 extern Pixel *write_buffer;
 
+extern bool refresh_screen_req;
+
 void init_input(void);
 
 #endif

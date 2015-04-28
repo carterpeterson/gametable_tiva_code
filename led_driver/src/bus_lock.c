@@ -44,7 +44,7 @@ void init_bus_lock_uart(void)
 		uart_channel_disable(UART7);
 		uart_config_baud(UART7, UART_BAUDRATE);
 		uart_config_line_control(UART7, (UART_CTL_WORD_LENGTH_8));
-		uart_enable_interrupts(UART7, 4);
+		uart_enable_interrupts(UART7, 5);
 		uart_interrupt_mask_set(UART7, 0x10);
 		uart_channel_enable(UART7, UART_CTL_ENABLE | UART_CTL_RX_ENABLE | UART_CTL_TX_ENABLE);
 	#endif
@@ -53,7 +53,21 @@ void init_bus_lock_uart(void)
 void give_lock(void)
 {
 	#ifdef LED_BOARD
-		
+		#ifdef ONE_I2C_BOARD
+			if(bus_lock_top || bus_lock_bottom) {
+				bus_lock_top = false;
+				bus_lock_bottom = false;
+				UART6->DR = 'l';
+				UART7->DR = 'l';
+			}
+		#else	
+			if(bus_lock_top && bus_lock_bottom) {
+				bus_lock_top = false;
+				bus_lock_bottom = false;
+				UART2->DR = 'l';
+				UART7->DR = 'l';
+			}
+		#endif
 	#else
 		if(bus_lock == true) {
 			bus_lock = false;
@@ -62,14 +76,34 @@ void give_lock(void)
 	#endif
 }
 
-bool get_lock(uint8_t lock_code)
+bool get_lock(uint8_t lock_code, bool top)
 {
-	if(lock_code == 'l') {
-		bus_lock = true;
-		return true;
-	} else {
-		return false;
-	}
+	#ifdef LED_BOARD
+		if(lock_code == 'l') {
+			if(top)
+				bus_lock_top = true;
+			else
+				bus_lock_bottom = true;
+			
+			#ifdef ONE_I2C_BOARD
+				return true;
+			#endif
+			
+			if(bus_lock_top && bus_lock_bottom)
+				return true;
+			else
+				return false;
+		} else {
+			return false;
+		}
+	#else
+		if(lock_code == 'l') {
+			bus_lock = true;
+			return true;
+		} else {
+			return false;
+		}
+	#endif
 }
 
 void init_bus_lock(void)

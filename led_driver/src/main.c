@@ -33,14 +33,19 @@ int main(void)
 	init_led_display();
 	init_capsense();
 	
-	poll_capsense();
-	give_lock();
+	#ifndef LED_BOARD
+		poll_capsense();
+		give_lock();
+	#endif
 	
 	while(1) {
 		// Do nothing, wait for frame buffer over UART
-		for(i = 0; i < 125000; i++) {
-			// wait
-		}
-		poll_capsense_req = true;
+		#ifndef LED_BOARD
+			for(i = 0; i < 125000; i++) {
+				// wait
+			}
+			poll_capsense_req = true;
+		#endif
+		
 	}	
 }

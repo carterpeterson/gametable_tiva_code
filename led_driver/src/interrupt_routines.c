@@ -40,9 +40,12 @@
 			status = UDMA->CHIS;
 			
 			if((status & (0x01 << 0)) == (0x01 << 0)){		
-				temp = write_buffer;
-				write_buffer = read_buffer;
-				read_buffer = temp;
+				if((!bus_lock_bottom || !bus_lock_top) || !refresh_screen_req) {
+					temp = write_buffer;
+					write_buffer = read_buffer;
+					read_buffer = temp;
+					refresh_screen_req = true;
+				}
 				
 				dma_channel_enable(0);
 				uart_rx_req.source = (void*) &(UART2->DR);
@@ -53,8 +56,6 @@
 				dma_primary_control_structure_set(0, &uart_rx_req);
 			
 				UDMA->CHIS |= (0x01 << 0); // Clear
-				
-				convert_buffer();
 			}
 		#else
 			uint32_t  status;
@@ -69,15 +70,44 @@
 	
 	void UART6_Handler(void)
 	{
-		uint8_t data = UART6->DR;
-		if(bus_lock || !get_lock(data))
-			return;
-		
-		if(poll_capsense_req) {
-			poll_capsense_req = false;
-			poll_capsense();
-		}
-		
-		give_lock();
+		#ifdef LED_BOARD
+			uint8_t data = UART6->DR;
+			if(bus_lock_top || !get_lock(data, true))
+				return;
+			
+			if(refresh_screen_req) {
+				refresh_screen_req = false;
+				convert_buffer();
+			}
+			
+			give_lock();
+		#else
+			uint8_t data = UART6->DR;
+			if(bus_lock || !get_lock(data, false))
+				return;
+			
+			if(poll_capsense_req) {
+				poll_capsense_req = false;
+				poll_capsense();
+			}
+			
+			give_lock();
+		#endif
 	}
+	
+	#ifdef LED_BOARD
+		void UART7_Handler(void)
+		{
+			uint8_t data = UART7->DR;
+			if(bus_lock_bottom || !get_lock(data, false))
+				return;
+			
+			if(refresh_screen_req) {
+				refresh_screen_req = false;
+				convert_buffer();
+			}
+			
+			give_lock();
+		}
+	#endif
 #endif

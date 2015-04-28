@@ -34,7 +34,9 @@ void switch_buffers(void)
 	frame_buffer = display_buffer;
 	display_buffer = temp;
 	
+	DisableInterrupts();
 	push_buffer(display_buffer, STRING_LENGTH_PIXEL);
+	EnableInterrupts();
 }
 
 void init_led_display_gpio(void)

@@ -23,6 +23,6 @@
 
 void init_bus_lock(void);
 void give_lock(void);
-bool get_lock(uint8_t lock_code);
+bool get_lock(uint8_t lock_code, bool top);
 
 #endif

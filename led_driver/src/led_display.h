@@ -25,6 +25,7 @@ typedef struct {
 #include "../library/timer.h"
 #include "../library/dma.h"
 #include "../library/uart.h"
+#include "../library/interrupt.h"
 
 typedef struct {
 	uint8_t pin;

@@ -3,6 +3,8 @@
 Pixel *read_buffer, *write_buffer;
 Pixel input_buffers[2][STRING_LENGTH_BITS];
 
+bool refresh_screen_req = false;
+
 void dma_init(void)
 {
 	DMA_control uart_rx_req;
