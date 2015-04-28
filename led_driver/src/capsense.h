@@ -32,6 +32,6 @@
 
 void init_capsense(void);
 void poll_capsense(void);
-extern bool pushing_uart;
+extern bool poll_capsense_req, pushing_uart;
 
 #endif

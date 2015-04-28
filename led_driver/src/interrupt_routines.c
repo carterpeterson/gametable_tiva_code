@@ -72,8 +72,11 @@
 		uint8_t data = UART6->DR;
 		if(bus_lock || !get_lock(data))
 			return;
-			
-		poll_capsense();
+		
+		if(poll_capsense_req) {
+			poll_capsense_req = false;
+			poll_capsense();
+		}
 		
 		give_lock();
 	}

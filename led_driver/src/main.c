@@ -21,6 +21,7 @@
 
 int main(void)
 {	
+	int i;
 	#ifndef LED_BOARD
 		//int i;
 		// Wait for LED board to be up and running
@@ -37,5 +38,9 @@ int main(void)
 	
 	while(1) {
 		// Do nothing, wait for frame buffer over UART
+		for(i = 0; i < 125000; i++) {
+			// wait
+		}
+		poll_capsense_req = true;
 	}	
 }

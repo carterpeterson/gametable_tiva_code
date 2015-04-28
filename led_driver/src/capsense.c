@@ -56,6 +56,7 @@ static Touch_section touch_sections[ACTIVE_SECTIONS_CAPSENSE] =
 uint32_t touch_buffers[2][TOUCH_BUFFER_SIZE] = {0};
 uint32_t *touch_read_buffer, *touch_write_buffer;
 bool pushing_uart = false;
+bool poll_capsense_req = false;
 
 void init_capsense_gpio(void)
 {
@@ -218,9 +219,6 @@ void transmit_touch_buffer(void)
 	if(!pushing_uart) {
 		pushing_uart = true;
 		queue_touch_buffer_dma();
-		for(i = 0; i < 125000; i++) {
-			// wait
-		}
 	}
 }
 
