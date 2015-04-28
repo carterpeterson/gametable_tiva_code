@@ -66,4 +66,25 @@
 			}
 		#endif
 	}
+	
+	
+	void UART6_Handler(void)
+	{
+		uint8_t data;
+		data = UART6->DR;
+		if(!get_lock(data))
+			return;
+			
+		if(capsense_poll_requested && !polling_capsense) {
+			poll_capsense();
+		}
+		give_lock();
+	}
+	
+	#ifdef LED_BOARD	
+		void UART7_Handler(void)
+		{
+		
+		}
+	#endif
 #endif

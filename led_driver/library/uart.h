@@ -63,6 +63,7 @@ void uart_clock_enable(uint8_t uarts);
 void uart_config_baud(UART0_Type *uart, uint32_t baud_rate);
 void uart_config_dma(UART0_Type *uart, uint8_t dma_config);
 void uart_config_line_control(UART0_Type *uart, uint8_t line_control);
+void uart_interrupt_mask_set(UART0_Type *uart, uint16_t interrupt_mask);
 void uart_enable_interrupts(UART0_Type *uart, uint8_t priority);
 void uart_channel_disable(UART0_Type *uart);
 void uart_channel_enable(UART0_Type *uart, uint32_t enable_flags);

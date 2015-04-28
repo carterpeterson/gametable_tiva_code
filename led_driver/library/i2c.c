@@ -156,20 +156,13 @@ bool i2c_read_byte(I2C0_Type* i2c, uint8_t *data, bool stop, bool repeat_start)
 void I2C0_Handler(void)
 {
 	i2c0.status = I2C0->MCS; // Capture it right away for timing purposes
+
+	if(i2c0.status & (I2C_MCS_BUSY))
+		return;
 	
-	if((I2C0->MRIS & I2C_MRIS_CLOCK_TO) == I2C_MRIS_CLOCK_TO) {
-		// Clock timed out, force a stop condition on the I2C line
-		I2C0->MCS = I2C_MCS_STOP;
-		I2C0->MICR |= I2C_MICR_CLOCK_TO;	// Clear interrupt
-		
-	} else if ((I2C0->MRIS & I2C_MRIS_MASTER) == I2C_MRIS_MASTER) {
-		if(i2c0.status & (I2C_MCS_BUSY | I2C_MCS_BUS_BUSY))
-			return;
-		
-		i2c0.update_pending = true;
-		
-		I2C0->MICR |= I2C_MICR_MASTER;	// Clear
-	}
+	i2c0.update_pending = true;
+	
+	I2C0->MICR |= I2C_MICR_MASTER;	// Clear
 }
 
 void I2C1_Handler(void)
@@ -178,32 +171,32 @@ void I2C1_Handler(void)
 	
 	if(i2c1.status & (I2C_MCS_BUSY | I2C_MCS_BUS_BUSY))
 		return;
-		
+	
 	i2c1.update_pending = true;
-		
-	I2C1->MICR = 0x01;	// Clear
+	
+	I2C1->MICR |= I2C_MICR_MASTER;	// Clear
 }
 
 void I2C2_Handler(void)
 {
-	i2c2.status = I2C2->MCS; // Capture it right away for timing purposes
-	
+	i2c2.status = I2C0->MCS; // Capture it right away for timing purposes
+
 	if(i2c2.status & (I2C_MCS_BUSY | I2C_MCS_BUS_BUSY))
 		return;
-		
+	
 	i2c2.update_pending = true;
-		
-	I2C2->MICR = 0x01;	// Clear
+	
+	I2C2->MICR |= I2C_MICR_MASTER;	// Clear
 }
 
 void I2C3_Handler(void)
 {
-	i2c3.status = I2C3->MCS; // Capture it right away for timing purposes
-	
+	i2c3.status = I2C0->MCS; // Capture it right away for timing purposes
+
 	if(i2c3.status & (I2C_MCS_BUSY | I2C_MCS_BUS_BUSY))
 		return;
-		
+	
 	i2c3.update_pending = true;
-		
-	I2C3->MICR = 0x01;	// Clear
+	
+	I2C3->MICR |= I2C_MICR_MASTER;	// Clear
 }

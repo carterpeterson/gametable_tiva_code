@@ -29,6 +29,11 @@ void uart_config_baud(UART0_Type *uart, uint32_t baud_rate)
 	uart->FBRD = fbrd;
 }
 
+void uart_interrupt_mask_set(UART0_Type *uart, uint16_t interrupt_mask)
+{
+	uart->IM |= interrupt_mask;
+}
+
 void uart_config_line_control(UART0_Type *uart, uint8_t line_control)
 {
   uart->LCRH = line_control;

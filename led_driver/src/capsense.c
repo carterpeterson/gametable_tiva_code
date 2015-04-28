@@ -15,15 +15,6 @@ typedef struct {
 
 static Touch_section touch_sections[ACTIVE_SECTIONS_CAPSENSE] =
 {
-	{0x00, false, &i2c0, {0, 0},
-		{{0x20, 14, 15}, {0x21, 31, 30}, 
-		{0x22, 12, 13}, {0x23, 29, 28},
-		{0x24, 10, 11}, {0x25, 27, 26},
-		{0x26, 8, 9}, {0x27, 25, 24},
-		{0x28, 6, 7}, {0x29, 23, 22}, 
-		{0x2A, 4, 5}, {0x2B, 21, 20},
-		{0x2C, 2, 3}, {0x2D, 19, 18},
-		{0x2E, 0, 1}, {0x2F, 17, 16}}},
 	{0x00, false, &i2c1, {0, 0},
 		{{0x20, 14, 15}, {0x21, 31, 30}, 
 		{0x22, 12, 13}, {0x23, 29, 28},
@@ -33,6 +24,7 @@ static Touch_section touch_sections[ACTIVE_SECTIONS_CAPSENSE] =
 		{0x2A, 4, 5}, {0x2B, 21, 20},
 		{0x2C, 2, 3}, {0x2D, 19, 18},
 		{0x2E, 0, 1}, {0x2F, 17, 16}}},
+
 	{0x00, false, &i2c2, {0, 0},
 		{{0x20, 17, 16}, {0x21, 0, 1}, 
 		{0x22, 19, 18}, {0x23, 2, 3},
@@ -50,12 +42,23 @@ static Touch_section touch_sections[ACTIVE_SECTIONS_CAPSENSE] =
 		{0x28, 25, 24}, {0x29, 8, 9}, 
 		{0x2A, 27, 26}, {0x2B, 10, 11},
 		{0x2C, 29, 28}, {0x2D, 12, 13},
-		{0x2E, 31, 30}, {0x2F, 14, 15}}}
+		{0x2E, 31, 30}, {0x2F, 14, 15}}},
+	{0x00, false, &i2c0, {0, 0},
+		{{0x20, 14, 15}, {0x21, 31, 30}, 
+		{0x22, 12, 13}, {0x23, 29, 28},
+		{0x24, 10, 11}, {0x25, 27, 26},
+		{0x26, 8, 9}, {0x27, 25, 24},
+		{0x28, 6, 7}, {0x29, 23, 22}, 
+		{0x2A, 4, 5}, {0x2B, 21, 20},
+		{0x2C, 2, 3}, {0x2D, 19, 18},
+		{0x2E, 0, 1}, {0x2F, 17, 16}}}
 };
 
 uint32_t touch_buffers[2][TOUCH_BUFFER_SIZE] = {0};
 uint32_t *touch_read_buffer, *touch_write_buffer;
 bool pushing_uart = false;
+bool capsense_poll_requested = false;
+bool polling_capsense = false;
 
 void init_capsense_gpio(void)
 {
@@ -109,18 +112,18 @@ void init_capsense_i2c(void)
 	i2c_config_speed(I2C1, I2C_TIMER_PERIOD_100K);
 	i2c_config_speed(I2C2, I2C_TIMER_PERIOD_100K);
 	i2c_config_speed(I2C3, I2C_TIMER_PERIOD_100K);
-	i2c_clock_low_timout_set(I2C0, I2C_CLOCK_LOW_TIMEOUT);
-	i2c_clock_low_timout_set(I2C1, I2C_CLOCK_LOW_TIMEOUT);
-	i2c_clock_low_timout_set(I2C2, I2C_CLOCK_LOW_TIMEOUT);
-	i2c_clock_low_timout_set(I2C3, I2C_CLOCK_LOW_TIMEOUT);
+	//i2c_clock_low_timout_set(I2C0, I2C_CLOCK_LOW_TIMEOUT);
+	//i2c_clock_low_timout_set(I2C1, I2C_CLOCK_LOW_TIMEOUT);
+	//i2c_clock_low_timout_set(I2C2, I2C_CLOCK_LOW_TIMEOUT);
+	//i2c_clock_low_timout_set(I2C3, I2C_CLOCK_LOW_TIMEOUT);
 	i2c_master_interrupt_enable(I2C0, 4);
 	i2c_master_interrupt_enable(I2C1, 4);
 	i2c_master_interrupt_enable(I2C2, 4);
 	i2c_master_interrupt_enable(I2C3, 4);
-	i2c_clock_timeout_interrupt_enable(I2C0, 4);
-	i2c_clock_timeout_interrupt_enable(I2C1, 4);
-	i2c_clock_timeout_interrupt_enable(I2C2, 4);
-	i2c_clock_timeout_interrupt_enable(I2C3, 4);
+	//i2c_clock_timeout_interrupt_enable(I2C0, 4);
+	//i2c_clock_timeout_interrupt_enable(I2C1, 4);
+	//i2c_clock_timeout_interrupt_enable(I2C2, 4);
+	//i2c_clock_timeout_interrupt_enable(I2C3, 4);
 }
 
 void init_capsense_buffers(void)
@@ -195,7 +198,6 @@ bool all_sections_complete(void)
 
 void transmit_touch_buffer(void)
 {
-	int i;
 	uint32_t *temp;
 
 	touch_write_buffer[0] = 0;
@@ -226,9 +228,6 @@ void transmit_touch_buffer(void)
 	if(!pushing_uart) {
 		pushing_uart = true;
 		queue_touch_buffer_dma();
-		for(i = 0; i < 125000; i++) {
-			// wait
-		}
 	}
 }
 
@@ -266,6 +265,10 @@ void process_capsense_section(Touch_section *section)
 			else
 				capsense_write(section);
 		} else { // Failed request
+			if (section->section_channel == &i2c0) {
+				section->section_channel->attempt = 0;
+			}
+		
 			section->section_channel->attempt = 0;
 			section->current_device++;
 			
@@ -328,6 +331,24 @@ void reset_touch_sections(void)
 	}
 }
 
+void poll_capsense(void)
+{
+	int i;
+	polling_capsense = true;
+	reset_touch_sections();
+	
+	while(!all_sections_complete()) {
+		for(i = 0; i < ACTIVE_SECTIONS_CAPSENSE; i++) {
+			process_capsense_section(&touch_sections[i]);
+		}
+	}
+	
+	transmit_touch_buffer();
+	capsense_poll_requested = false;
+	polling_capsense = false;
+}
+
+
 void init_capsense(void)
 {	
 	int i;
@@ -337,16 +358,6 @@ void init_capsense(void)
 	init_capsense_i2c();
 	init_capsense_buffers();
 	init_capsense_dma();
-	reset_touch_sections();
-	
-	while(1) {
-		if(all_sections_complete()) {
-			transmit_touch_buffer();
-			reset_touch_sections();
-		} else {
-			for(i = 0; i < ACTIVE_SECTIONS_CAPSENSE; i++) {
-				process_capsense_section(&touch_sections[i]);
-			}
-		}
-	}
+	poll_capsense();
+	give_lock();
 }

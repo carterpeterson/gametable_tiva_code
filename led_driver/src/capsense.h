@@ -11,6 +11,7 @@
 #include "input.h"
 #include "interrupt_routines.h"
 #include "app_config.h"
+#include "bus_lock.h"
 #include "../library/gpio.h"
 #include "../library/i2c.h"
 
@@ -31,6 +32,7 @@
 #endif
 
 void init_capsense(void);
-extern bool pushing_uart;
+void poll_capsense(void);
+extern bool pushing_uart, capsense_poll_requested, polling_capsense;
 
 #endif

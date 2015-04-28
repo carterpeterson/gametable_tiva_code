@@ -18,4 +18,6 @@
 
 #define I2C_CLOCK_LOW_TIMEOUT		0x1f // 0x1f0 (0 added by hardware) gives roughly 5 ms
 
+#define UART_BAUDRATE 				460800
+
 #endif
