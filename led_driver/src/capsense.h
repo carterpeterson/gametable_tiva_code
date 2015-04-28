@@ -31,6 +31,7 @@
 #endif
 
 void init_capsense(void);
+void poll_capsense(void);
 extern bool pushing_uart;
 
 #endif

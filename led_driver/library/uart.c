@@ -75,6 +75,11 @@ void uart_enable_interrupts(UART0_Type *uart, uint8_t priority)
   NVIC_EnableIRQ(interrupt_vector);
 }
 
+void uart_interrupt_mask_set(UART0_Type *uart, uint16_t interrupt_mask)
+{
+	uart->IM |= interrupt_mask;
+}
+
 void uart_config_dma(UART0_Type *uart, uint8_t dma_config)
 {
 	uart->DMACTL = dma_config;

@@ -414,6 +414,16 @@
               <FilePath>.\src\app_config.h</FilePath>
             </File>
             <File>
+              <FileName>bus_lock.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\bus_lock.h</FilePath>
+            </File>
+            <File>
+              <FileName>bus_lock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\bus_lock.c</FilePath>
+            </File>
+            <File>
               <FileName>capsense.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\src\capsense.h</FilePath>

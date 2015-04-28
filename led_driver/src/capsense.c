@@ -109,10 +109,10 @@ void init_capsense_i2c(void)
 	i2c_config_speed(I2C1, I2C_TIMER_PERIOD_100K);
 	i2c_config_speed(I2C2, I2C_TIMER_PERIOD_100K);
 	i2c_config_speed(I2C3, I2C_TIMER_PERIOD_100K);
-	i2c_master_interrupt_enable(I2C0, 4);
-	i2c_master_interrupt_enable(I2C1, 4);
-	i2c_master_interrupt_enable(I2C2, 4);
-	i2c_master_interrupt_enable(I2C3, 4);
+	i2c_master_interrupt_enable(I2C0, 3);
+	i2c_master_interrupt_enable(I2C1, 3);
+	i2c_master_interrupt_enable(I2C2, 3);
+	i2c_master_interrupt_enable(I2C3, 3);
 }
 
 void init_capsense_buffers(void)
@@ -329,12 +329,17 @@ void init_capsense(void)
 	init_capsense_i2c();
 	init_capsense_buffers();
 	init_capsense_dma();
+}
+
+void poll_capsense(void)
+{
+	int i;
 	reset_touch_sections();
 	
 	while(1) {
 		if(all_sections_complete()) {
 			transmit_touch_buffer();
-			reset_touch_sections();
+			return;
 		} else {
 			for(i = 0; i < ACTIVE_SECTIONS_CAPSENSE; i++) {
 				process_capsense_section(&touch_sections[i]);

@@ -9,6 +9,7 @@
 #include "../library/dma.h"
 #include "led_display.h"
 #include "capsense.h"
+#include "bus_lock.h"
 #include "../library/i2c.h"
 
 #endif

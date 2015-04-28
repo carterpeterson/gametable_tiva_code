@@ -66,4 +66,15 @@
 			}
 		#endif
 	}
+	
+	void UART6_Handler(void)
+	{
+		uint8_t data = UART6->DR;
+		if(bus_lock || !get_lock(data))
+			return;
+			
+		poll_capsense();
+		
+		give_lock();
+	}
 #endif

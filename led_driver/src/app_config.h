@@ -16,4 +16,6 @@
 //#define LED_BOARD
 //#define USING_SIMULATOR
 
+#define UART_BAUDRATE 460800
+
 #endif
