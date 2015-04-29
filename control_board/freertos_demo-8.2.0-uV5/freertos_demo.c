@@ -104,7 +104,7 @@ void bloom_animation(void)
 		}
 
 		if(is_pixel_touched(i, j)) {
-			set_pixel(i, j, white_pixel);
+			set_pixel(i, j, p);
 		} else {
 			set_pixel(i, j, black_pixel);
 		}
@@ -126,9 +126,9 @@ int main(void)
 	init_touch_input();
 
 	// Wait for LED board to be up and running
-	for(i = 0; i < 50000000; i++) {
+	//for(i = 0; i < 50000000; i++) {
 	
-	}
+	//}
 
 	//
 	// Create a mutex to guard the UART.

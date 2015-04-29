@@ -9,7 +9,7 @@
 void init_bus_lock_gpio(void)
 {
 	// Setup GPIO for UART6
-	gpio_port_enable(PORT_D_CGC);
+	// gpio_port_enable(PORT_D_CGC); Don't need cause UART 2 aka D is already on
 	gpio_digital_enable(PORT_D, (PIN_4 | PIN_5));
 	gpio_pin_direction(PORT_D, DIRECTION_OUTPUT, PIN_5);
 	gpio_pin_direction(PORT_D, DIRECTION_INPUT, PIN_4);

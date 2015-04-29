@@ -13,7 +13,7 @@
 #define ACTIVE_SECTIONS_CAPSENSE 	4
 #define WIDTH_PIXELS 		32
 
-#define LED_BOARD
+//#define LED_BOARD
 //#define USING_SIMULATOR
 
 #define UART_BAUDRATE 460800

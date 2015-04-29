@@ -28,12 +28,13 @@ int main(void)
 		//for(i = 0; i < 160000000; i++) {}
 	#endif
 	
-	init_bus_lock();
+	
 	init_input();
 	init_led_display();
-	init_capsense();
+	init_bus_lock();
 	
 	#ifndef LED_BOARD
+		init_capsense();
 		poll_capsense();
 		give_lock();
 	#endif
@@ -46,6 +47,5 @@ int main(void)
 			}
 			poll_capsense_req = true;
 		#endif
-		
 	}	
 }
