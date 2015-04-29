@@ -576,6 +576,26 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>tasks</GroupName>
+          <Files>
+            <File>
+              <FileName>bloom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\bloom.h</FilePath>
+            </File>
+            <File>
+              <FileName>bloom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\bloom.c</FilePath>
+            </File>
+            <File>
+              <FileName>tasks.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\tasks.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>

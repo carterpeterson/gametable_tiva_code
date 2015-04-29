@@ -29,124 +29,42 @@
 #include "queue.h"
 #include "semphr.h"
 
+#include "tasks.h"
 #include "led_display.h"
 #include "touch_input.h"
 
 
-//*****************************************************************************
-//
-// The mutex that protects concurrent access of UART from multiple tasks.
-//
-//*****************************************************************************
-xSemaphoreHandle g_pUARTSemaphore;
-
-#define BLOOM_RADIUS 3
-#define FULL_RADIUS_STEP 100
-
-static uint16_t current_color_base = 0;
-static float MAX_RADIUS;
-
-Pixel get_bloom_pixel(int i, int j)
+void start_task(void)
 {
-  Pixel p;
-  uint16_t current_color = current_color_base;
-
-  current_color += (uint16_t) ((hypot((float) i, (float) j) / MAX_RADIUS) * FULL_RADIUS_STEP);
-  current_color = current_color % 768;
+	BaseType_t return_val;
   
-  if(current_color < 256) {
-    p.red = (255 - current_color);
-    p.green = current_color;
-    p.blue = 0;
-  } else if(current_color < 512) {
-    p.red = 0;
-    p.green = (511 - current_color);
-    p.blue = (current_color - 256);
-  } else {
-    p.red = (current_color - 512);
-    p.green = 0;
-    p.blue = 767 - current_color ;
-  }
-
-  return p;
+    //
+    // Create the LED task.
+    //
+    return_val = xTaskCreate(
+                              task_bloom,                            	// Function Pointer
+                              (signed portCHAR *)"bloom",           	// Task Name
+                              TASK_STACK_SIZE,                  		// Stack Depth in Words
+                              NULL,                                   	// Parameters to Function (games and animations have none)
+                              tskIDLE_PRIORITY + PRIORITY_ANIMATION,  	// Task Priority
+                              NULL);                                  	// Task Handle
 }
-
-void bloom_animation(void)
-{
-  int i, j, temp;
-  Pixel white_pixel, black_pixel;
-  MAX_RADIUS = hypot(BLOOM_RADIUS, BLOOM_RADIUS);
-  current_color_base += 1;
-  white_pixel.red = 255;
-  white_pixel.green = 0;
-  white_pixel.blue = 0;
-  
-  black_pixel.red = 0;
-  black_pixel.green = 0;
-  black_pixel.blue = 0;
-
-  if(current_color_base > (256 * 3))
-    current_color_base = 0;
-
-  for(i = 0; i < 32; i++) {
-    temp = i;
-    
-    for(j = 0; j < 8; j++) {
-		Pixel p;
-		if((i % 6) < 3 && (j % 6) < 3) {
-			p = get_bloom_pixel((i % 3), (j % 3));
-		} else if ((i % 6) >= 3 && (j % 6) < 3) {
-			p = get_bloom_pixel(3 - (i % 3), (j % 3));	
-		} else if ((i % 6) < 3 && (j % 6) >= 3) {
-			p = get_bloom_pixel((i % 3), 3 - (j % 3));	
-		} else {
-			p = get_bloom_pixel(3 - (i % 3), 3 - (j % 3));	
-		}
-
-		if(is_pixel_touched(i, j)) {
-			set_pixel(i, j, p);
-		} else {
-			set_pixel(i, j, black_pixel);
-		}
-	}
-    i = temp;
-  }
-
-  render();
-}
-
 
 //*****************************************************************************
 //*****************************************************************************
 int main(void)
 {
-	Pixel p;
-	int i, j;
 	init_led_display();
 	init_touch_input();
 
-	// Wait for LED board to be up and running
-	//for(i = 0; i < 50000000; i++) {
-	
-	//}
-
-	//
-	// Create a mutex to guard the UART.
-	//
-	//g_pUARTSemaphore = xSemaphoreCreateMutex();
+	//start_task();
 
 	//
 	// Start the scheduler.  This should not return.
 	//
 	//vTaskStartScheduler();
-
-	while(1)
-	{
-	 bloom_animation();
-	 for(i = 0; i < 30000; i++) {
-		// Wait
-	 }
-	}
+	
+	task_bloom(NULL);
 }
 
 //*****************************************************************************
