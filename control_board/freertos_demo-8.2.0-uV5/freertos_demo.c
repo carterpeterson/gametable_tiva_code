@@ -57,14 +57,12 @@ int main(void)
 	init_led_display();
 	init_touch_input();
 
-	//start_task();
+	start_task();
 
 	//
 	// Start the scheduler.  This should not return.
 	//
-	//vTaskStartScheduler();
-	
-	task_bloom(NULL);
+	vTaskStartScheduler();
 }
 
 //*****************************************************************************

@@ -72,9 +72,9 @@ void task_bloom(void *pvParameters)
 		}
 
 		render();
-		//vTaskDelayUntil(&startup_time, TICK_DELAY_30_FPS);
-		for(i = 0; i < 250000; i++) {
+		vTaskDelayUntil(&startup_time, TICK_DELAY_30_FPS);
+		/*for(i = 0; i < 250000; i++) {
 			// Wait
-		}
+		}*/
 	}
 }
