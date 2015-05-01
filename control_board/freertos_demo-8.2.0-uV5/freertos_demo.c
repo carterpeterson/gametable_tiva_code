@@ -32,23 +32,8 @@
 #include "tasks.h"
 #include "led_display.h"
 #include "touch_input.h"
-
-
-void start_task(void)
-{
-	BaseType_t return_val;
-  
-    //
-    // Create the LED task.
-    //
-    return_val = xTaskCreate(
-                              task_bloom,                            	// Function Pointer
-                              (signed portCHAR *)"bloom",           	// Task Name
-                              TASK_STACK_SIZE,                  		// Stack Depth in Words
-                              NULL,                                   	// Parameters to Function (games and animations have none)
-                              tskIDLE_PRIORITY + PRIORITY_ANIMATION,  	// Task Priority
-                              NULL);                                  	// Task Handle
-}
+#include "lcd_menu.h"
+#include "hypervisor.h"
 
 //*****************************************************************************
 //*****************************************************************************
@@ -56,8 +41,9 @@ int main(void)
 {
 	init_led_display();
 	init_touch_input();
+	init_lcd_menu();
 
-	start_task();
+	init_hypervisor_task();
 
 	//
 	// Start the scheduler.  This should not return.

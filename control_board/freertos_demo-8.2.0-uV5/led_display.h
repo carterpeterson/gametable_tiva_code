@@ -31,6 +31,8 @@ typedef struct {
 	#define FRAME_OUTPUT_DMA_CHANNEL 1
 #endif
 
+#define PIXELS_WIDTH 32
+
 extern Pixel *frame_buffer;		// The buffer being modified
 extern bool pushing_frame;
 

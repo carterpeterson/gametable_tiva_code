@@ -82,6 +82,13 @@
 	#endif
 	
 #else
+	void HardFault_Handler(void)
+	{
+		while(1) {
+			// iz dead
+		}
+	}
+
 	void UART2_Handler(void)
 	{    
 		uint32_t  status;

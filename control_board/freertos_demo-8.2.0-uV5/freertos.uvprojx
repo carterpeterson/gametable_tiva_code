@@ -419,16 +419,6 @@
               <FilePath>.\freertos_demo.c</FilePath>
             </File>
             <File>
-              <FileName>led_display.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\led_display.h</FilePath>
-            </File>
-            <File>
-              <FileName>led_display.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\led_display.c</FilePath>
-            </File>
-            <File>
               <FileName>interrupt_routines.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\interrupt_routines.h</FilePath>
@@ -437,6 +427,26 @@
               <FileName>interrupt_routines.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\interrupt_routines.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_menu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\lcd_menu.h</FilePath>
+            </File>
+            <File>
+              <FileName>lcd_menu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\lcd_menu.c</FilePath>
+            </File>
+            <File>
+              <FileName>led_display.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\led_display.h</FilePath>
+            </File>
+            <File>
+              <FileName>led_display.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\led_display.c</FilePath>
             </File>
             <File>
               <FileName>touch_input.h</FileName>
@@ -499,9 +509,24 @@
           <GroupName>Drivers</GroupName>
           <Files>
             <File>
+              <FileName>config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\config.h</FilePath>
+            </File>
+            <File>
+              <FileName>dma.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\dma.h</FilePath>
+            </File>
+            <File>
               <FileName>dma.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\drivers\dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>gpio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\gpio.h</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
@@ -509,9 +534,19 @@
               <FilePath>..\drivers\gpio.c</FilePath>
             </File>
             <File>
+              <FileName>i2c.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\i2c.h</FilePath>
+            </File>
+            <File>
               <FileName>i2c.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\drivers\i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>interrupt.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\interrupt.h</FilePath>
             </File>
             <File>
               <FileName>interrupt.c</FileName>
@@ -519,9 +554,19 @@
               <FilePath>..\drivers\interrupt.c</FilePath>
             </File>
             <File>
-              <FileName>pc_buffer.c</FileName>
+              <FileName>spi.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\spi.h</FilePath>
+            </File>
+            <File>
+              <FileName>spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\drivers\pc_buffer.c</FilePath>
+              <FilePath>..\drivers\spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>timer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\timer.h</FilePath>
             </File>
             <File>
               <FileName>timer.c</FileName>
@@ -534,41 +579,6 @@
               <FilePath>..\drivers\uart.c</FilePath>
             </File>
             <File>
-              <FileName>config.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\config.h</FilePath>
-            </File>
-            <File>
-              <FileName>dma.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\dma.h</FilePath>
-            </File>
-            <File>
-              <FileName>gpio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\gpio.h</FilePath>
-            </File>
-            <File>
-              <FileName>i2c.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\i2c.h</FilePath>
-            </File>
-            <File>
-              <FileName>interrupt.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\interrupt.h</FilePath>
-            </File>
-            <File>
-              <FileName>pc_buffer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\pc_buffer.h</FilePath>
-            </File>
-            <File>
-              <FileName>timer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\timer.h</FilePath>
-            </File>
-            <File>
               <FileName>uart.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\drivers\uart.h</FilePath>
@@ -579,9 +589,19 @@
           <GroupName>tasks</GroupName>
           <Files>
             <File>
-              <FileName>bloom.h</FileName>
+              <FileName>hypervisor.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\bloom.h</FilePath>
+              <FilePath>.\hypervisor.h</FilePath>
+            </File>
+            <File>
+              <FileName>hypervisor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hypervisor.c</FilePath>
+            </File>
+            <File>
+              <FileName>tasks.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\tasks.h</FilePath>
             </File>
             <File>
               <FileName>bloom.c</FileName>
@@ -589,9 +609,14 @@
               <FilePath>.\bloom.c</FilePath>
             </File>
             <File>
-              <FileName>tasks.h</FileName>
+              <FileName>snake.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\tasks.h</FilePath>
+              <FilePath>.\snake.h</FilePath>
+            </File>
+            <File>
+              <FileName>snake.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\snake.c</FilePath>
             </File>
           </Files>
         </Group>

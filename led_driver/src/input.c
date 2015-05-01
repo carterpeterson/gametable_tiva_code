@@ -1,7 +1,7 @@
 #include "input.h"
 
 Pixel *read_buffer, *write_buffer;
-Pixel input_buffers[2][STRING_LENGTH_BITS];
+Pixel input_buffers[2][STRING_LENGTH_BITS + 1];
 
 bool refresh_screen_req = false;
 
@@ -27,7 +27,6 @@ void dma_init(void)
 		dma_primary_control_structure_set(8, &uart_rx_req);
 	#else
 		dma_enable();
-		dma_channel_enable(0);
 		dma_priority_set(0, DMA_PRIORITY_HIGH);
 		dma_use_primary_control(0);
 		dma_use_burst(0, DMA_USE_BURST_AND_SINGLE);
@@ -39,9 +38,10 @@ void dma_init(void)
 		uart_rx_req.destination = &(write_buffer[TOTAL_PIXELS - 1].blue);
 		uart_rx_req.control = (DMA_DSTINC_BYTE | \
 		DMA_DSTSIZE_BYTE | DMA_SRCINC_NONE | DMA_SRCSIZE_BYTE | \
-		DMA_ARBSIZE_2 | (INPUT_BUFF_MINUS_ONE << 4) | DMA_XFERMODE_BASIC);
+		DMA_ARBSIZE_2 | ((INPUT_BUFF_MINUS_ONE + 1) << 4) | DMA_XFERMODE_BASIC);
 		
 		dma_primary_control_structure_set(0, &uart_rx_req);
+		dma_channel_enable(0);
 	#endif
 }
 
@@ -68,6 +68,8 @@ void init_input_gpio(void)
 
 void init_input_uart(void)
 {
+	uint8_t data;
+
 	uart_clock_enable(UART0_CGC);
 	uart_channel_disable(UART0);
 	uart_config_baud(UART0, 460800);
@@ -91,14 +93,18 @@ void init_input_uart(void)
 		uart_channel_enable(UART2, UART_CTL_ENABLE | UART_CTL_RX_ENABLE | UART_CTL_TX_ENABLE);
 		UART2->IFLS = 0;
 		UART2->IFLS |= 0x10;
+		
+		while((UART2->FR & 0x10) != 0x10) {
+			data = UART2->DR;
+		}
 	#endif
 }
 
 void init_input(void)
 {
-	write_buffer = input_buffers[0];
-	read_buffer = input_buffers[1];
-	
+	write_buffer = &input_buffers[0][1];
+	read_buffer = &input_buffers[1][1];
+
 	init_input_gpio();
 	init_input_uart();
 	dma_init();

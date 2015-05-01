@@ -47,13 +47,14 @@
 					refresh_screen_req = true;
 				}
 				
-				dma_channel_enable(0);
+				
 				uart_rx_req.source = (void*) &(UART2->DR);
 				uart_rx_req.destination = &(write_buffer[TOTAL_PIXELS - 1].blue);
 				uart_rx_req.control = (DMA_DSTINC_BYTE | \
 				DMA_DSTSIZE_BYTE | DMA_SRCINC_NONE | DMA_SRCSIZE_BYTE | \
 				DMA_ARBSIZE_2 | (INPUT_BUFF_MINUS_ONE << 4) | DMA_XFERMODE_BASIC);		
 				dma_primary_control_structure_set(0, &uart_rx_req);
+				dma_channel_enable(0);
 			
 				UDMA->CHIS |= (0x01 << 0); // Clear
 			}
