@@ -39,9 +39,12 @@
 //*****************************************************************************
 int main(void)
 {
-	init_led_display();
-	init_touch_input();
+	//init_led_display();
+	//init_touch_input();
 	init_lcd_menu();
+	
+	while(1){
+	}
 
 	init_hypervisor_task();
 

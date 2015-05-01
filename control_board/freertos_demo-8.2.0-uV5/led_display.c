@@ -89,7 +89,7 @@ void init_led_display_uart(void)
 		uart_config_baud(UART0, UART_BAUDRATE);
 		uart_config_line_control(UART0, (UART_CTL_WORD_LENGTH_8 | UART_LCRH_FEN));
 		uart_config_dma(UART0, UART_DMACTL_TX_EN);
-		uart_enable_interrupts(UART0, 1);
+		uart_enable_interrupts(UART0, 3);
 		UART0->IFLS &= (~0x0F);
 		UART0->IFLS |= 0x03;
 		uart_channel_enable(UART0, UART_CTL_ENABLE | UART_CTL_RX_ENABLE | UART_CTL_TX_ENABLE);
@@ -99,7 +99,7 @@ void init_led_display_uart(void)
 		uart_config_baud(UART2, UART_BAUDRATE);
 		uart_config_line_control(UART2, (UART_CTL_WORD_LENGTH_8 | UART_LCRH_FEN));
 		uart_config_dma(UART2, UART_DMACTL_TX_EN);
-		uart_enable_interrupts(UART2, 1);
+		uart_enable_interrupts(UART2, 3);
 		UART2->IFLS = 0x03;
 		uart_channel_enable(UART2, UART_CTL_ENABLE | UART_CTL_RX_ENABLE | UART_CTL_TX_ENABLE);
 	#endif

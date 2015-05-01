@@ -8,6 +8,7 @@
 #include "app_config.h"
 #include "led_display.h"
 #include "touch_input.h"
+#include "lcd_menu.h"
 #include "../drivers/dma.h"
 #include "../drivers/i2c.h"
 

@@ -117,7 +117,7 @@ void init_touch_input_uart(void)
 		uart_config_baud(UART6, UART_BAUDRATE);
 		uart_config_line_control(UART6, (UART_CTL_WORD_LENGTH_8 | UART_LCRH_FEN));
 		uart_config_dma(UART6, UART_DMACTL_RX_EN);
-		uart_enable_interrupts(UART6, 1);
+		uart_enable_interrupts(UART6, 2);
 		UART6->IFLS &= (~0xF0);
 		UART6->IFLS |= 0x10;
 		uart_channel_enable(UART6, UART_CTL_ENABLE | UART_CTL_RX_ENABLE | UART_CTL_TX_ENABLE);
@@ -128,7 +128,7 @@ void init_touch_input_uart(void)
 		uart_config_baud(UART7, UART_BAUDRATE);
 		uart_config_line_control(UART7, (UART_CTL_WORD_LENGTH_8 | UART_LCRH_FEN));
 		uart_config_dma(UART7, UART_DMACTL_RX_EN);
-		uart_enable_interrupts(UART7, 1);
+		uart_enable_interrupts(UART7, 2);
 		UART7->IFLS &= (~0xF0);
 		UART7->IFLS |= 0x10;
 		uart_channel_enable(UART7, UART_CTL_ENABLE | UART_CTL_RX_ENABLE | UART_CTL_TX_ENABLE);

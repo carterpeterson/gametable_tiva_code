@@ -100,6 +100,17 @@
 		}
 	}
 	
+	void SSI0_Handler(void)
+	{
+		uint32_t  status;
+		status = UDMA->CHIS;
+		
+		if((status & (0x01 << LCD_DMA_CHANNEL)) == (0x01 << LCD_DMA_CHANNEL)){		
+			UDMA->CHIS |= (0x01 << LCD_DMA_CHANNEL); // Clear
+			pushing_lcd_menu = false;
+		}
+	}
+	
 	void UART6_Handler(void)
 	{
 		DMA_control touch_input_rx_req;
