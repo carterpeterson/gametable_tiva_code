@@ -78,6 +78,11 @@ bool gpio_alternate_function_enable(GPIOA_Type *port, uint8_t pins)
 	return true;
 }
 
+void gpio_pull_up_enable(GPIOA_Type *port, uint8_t pins)
+{
+		port->PUR |= pins;
+}
+
 bool gpio_open_drain_enable(GPIOA_Type *port, uint8_t pins)
 {
 	port->ODR |= pins;

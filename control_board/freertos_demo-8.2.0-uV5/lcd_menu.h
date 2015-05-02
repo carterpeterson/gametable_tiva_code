@@ -1,7 +1,6 @@
 #ifndef __LCD_MENU_H__
 #define __LCD_MENU_H__
 
-
 // C
 #include <stdio.h>
 #include <stdint.h>
@@ -17,7 +16,9 @@
 #include "../drivers/gpio.h"
 #include "../drivers/spi.h"
 #include "../drivers/dma.h"
+#include "hypervisor.h"
 #include "lcd_graphics.h"
+#include "tasks.h"
 
 #define LCD_SPI			SSI0
 #define LCD_PORT		PORT_A
@@ -41,5 +42,7 @@ void lcd_set_command_mode(void);
 void lcd_set_data_mode(void);
 void lcd_set_page(uint8_t page);
 void lcd_set_column(uint8_t column);
+void lcd_write_string_8pts( uint8_t line, char *string);
+void lcd_update(void);
 
 #endif

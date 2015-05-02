@@ -1,5 +1,10 @@
 #include "hypervisor.h"
 
+bool viewing_games = false;
+uint8_t current_game_selected = 3;
+uint8_t current_animation_selected = 0;
+TaskHandle_t hypervisor_task;
+
 void task_hypervisor(void *pvParameters)
 {
 	BaseType_t return_val;
@@ -8,28 +13,57 @@ void task_hypervisor(void *pvParameters)
 	
 	startup_time = xTaskGetTickCount();
 	
-    return_val = xTaskCreate(
+	vTaskDelayUntil(&startup_time, 1000);	// Let all the drivers settle down and whatnot
+	
+	lcd_update();
+	
+	return_val = xTaskCreate(
                               task_snake_game,                            	// Function Pointer
                               (signed portCHAR *)"snake",           		// Task Name
                               TASK_STACK_SIZE,                  		// Stack Depth in Words
                               NULL,                                   	// Parameters to Function (games and animations have none)
                               tskIDLE_PRIORITY + PRIORITY_ANIMATION,  	// Task Priority
                               &created_task);                                  	// Task Handle
-	
-	
-	vTaskDelayUntil(&startup_time, 1000);
-
-	/*xTaskCreate(
-				  task_pacman_animation,                   	// Function Pointer
-				  (signed portCHAR *)"pacman",           	// Task Name
-				  TASK_STACK_SIZE,                  		// Stack Depth in Words
-				  NULL,                                   	// Parameters to Function (games and animations have none)
-				  tskIDLE_PRIORITY + PRIORITY_ANIMATION,  	// Task Priority
-				  &created_task);*/   
 
 	while(1) {
-		vTaskDelayUntil(&startup_time, 1);
+		vTaskSuspend(NULL);
 	
+		if(center_pressed) {
+			// change task
+		} else if(left_pressed) {
+			viewing_games = !viewing_games;
+		} else if(up_pressed) {
+			if(viewing_games) {
+				if(current_game_selected == 0)
+					current_game_selected = (NUM_GAMETABLE_GAMES - 1);
+				else
+					current_game_selected--;
+			} else {
+				if(current_animation_selected == 0)
+					current_animation_selected = (NUM_GAMETABLE_ANIMATIONS - 1);
+				else
+					current_animation_selected--;
+			}
+		} else if(right_pressed) {
+			viewing_games = !viewing_games;
+		} else if(down_pressed) {
+			if(viewing_games) {
+				current_game_selected++;
+				current_game_selected =	(current_game_selected % NUM_GAMETABLE_GAMES);
+			} else {
+				current_animation_selected++;
+				current_animation_selected = (current_animation_selected % NUM_GAMETABLE_ANIMATIONS);
+			}
+		}
+		
+		// Clear all the buttons just in case
+		center_pressed = false;
+		left_pressed = false;
+		up_pressed = false;
+		right_pressed = false;
+		down_pressed = false;
+		
+		lcd_update();
 	}
 }
 
@@ -46,5 +80,5 @@ bool init_hypervisor_task(void)
                               TASK_STACK_SIZE,                  		// Stack Depth in Words
                               NULL,                                   	// Parameters to Function (games and animations have none)
                               tskIDLE_PRIORITY + PRIORITY_HYPERVISOR,  	// Task Priority
-                              NULL);    
+                              &hypervisor_task);    
 }

@@ -169,6 +169,159 @@ void lcd_draw_top_bar(const uint8_t img[]){
 	}
 }
 
+void lcd_write_char_8pts(uint8_t page, char c, uint8_t col_start)
+{
+	int i;
+	int actCol;
+	
+	//get index of character
+  int index = (c - 32)*18;
+
+	actCol = col_start;
+	
+	for(i = 0; i < 9; i++){
+		lcd_set_buffer_byte(page, actCol, hPSimplified_8ptBitmaps[index]);
+		index = index + 1;
+		actCol = actCol + 1;
+	}
+
+	actCol = col_start;
+	for(i = 0; i < 9; i++){
+		lcd_set_buffer_byte(page + 1, actCol, hPSimplified_8ptBitmaps[index]);
+		index = index + 1;
+		actCol = actCol + 1;
+	}
+}
+
+void lcd_write_string_8pts( uint8_t line, char *string)
+{
+
+	int colcnt = 4;
+	int cnt = 0;
+	char *ptr = string;
+	int strtPage = line;
+	
+	
+	while(cnt != 11){
+		if(*ptr == '\0'){
+			break;
+		}
+	  lcd_write_char_8pts(strtPage, *ptr, colcnt);
+		colcnt = colcnt + 8;
+		ptr += 1;
+		cnt += 1;
+	}
+}
+
+void lcd_write_arrow(uint8_t sel)
+{
+	int i;
+	uint8_t page;
+	int index = 0;
+	int actCol = 0;
+	
+	if(sel == 0){
+		page = 2;
+	}else if(sel == 1){
+		page = 4;
+	}else{
+		page = 6;
+	}
+	
+	for(i = 0; i < 3; i++){
+		lcd_set_buffer_byte(page, actCol, Image_Arrow_8ptBitmaps[index]);
+		index = index + 1;
+		actCol = actCol + 1;
+	}
+
+	actCol = 0;
+	for(i = 0; i < 3; i++){
+		lcd_set_buffer_byte(page + 1, actCol, Image_Arrow_8ptBitmaps[index]);
+		index = index + 1;
+		actCol = actCol + 1;
+	}
+	
+}
+
+void clear_display_buffer(void)
+{
+	int i;
+	for(i = 0; i < 102 * 8; i++) {
+		lcd_buffer_write[i] = 0x00;
+	}
+}
+
+void lcd_update(void)
+{
+	int i;
+	
+	clear_display_buffer();
+	
+	if (viewing_games) {
+		lcd_draw_top_bar(Image_LCD_GameSelect);
+		
+		if(current_game_selected <= 1) {
+			// draw first 3 games
+			for(i = 0; i < 3; i++) {
+				if(i >= NUM_GAMETABLE_GAMES)
+					break;	// Done drawing games
+				
+				lcd_write_string_8pts(2 + i*2, GAMETABLE_GAMES[i].name);
+			}
+			
+			lcd_write_arrow(current_game_selected);
+			
+		} else if(current_game_selected >= (NUM_GAMETABLE_GAMES - 2)) {
+			// Draw last 3 games
+			for(i = (NUM_GAMETABLE_GAMES - 3); i < NUM_GAMETABLE_GAMES; i++) {				
+				lcd_write_string_8pts(2 + (i - (NUM_GAMETABLE_GAMES - 3)) *2, GAMETABLE_GAMES[i].name);
+			}
+			
+			lcd_write_arrow(current_game_selected - (NUM_GAMETABLE_GAMES - 3));
+		} else {
+			// center arrow and draw surrounding games
+			for(i = (current_game_selected - 1); i <= (current_game_selected + 1); i++) {				
+				lcd_write_string_8pts(2 + (i - (current_game_selected - 1))*2, GAMETABLE_GAMES[i].name);
+			}
+			
+			lcd_write_arrow(1);
+		}
+		
+	} else {
+		lcd_draw_top_bar(Image_LCD_AnimationSelect);
+		
+		if(current_animation_selected <= 1) {
+			// draw first 3 games
+			for(i = 0; i < 3; i++) {
+				if(i >= NUM_GAMETABLE_ANIMATIONS)
+					break;	// Done drawing games
+				
+				lcd_write_string_8pts(2 + i*2, GAMETABLE_ANIMATIONS[i].name);
+			}
+			
+			lcd_write_arrow(current_animation_selected);
+			
+		} else if(current_animation_selected >= (NUM_GAMETABLE_ANIMATIONS - 2)) {
+			// Draw last 3 games
+			for(i = (NUM_GAMETABLE_ANIMATIONS - 3); i < NUM_GAMETABLE_ANIMATIONS; i++) {				
+				lcd_write_string_8pts(2 + (i - (NUM_GAMETABLE_ANIMATIONS - 3)) *2, GAMETABLE_ANIMATIONS[i].name);
+			}
+			
+			lcd_write_arrow(current_animation_selected - (NUM_GAMETABLE_ANIMATIONS - 3));
+		} else {
+			// center arrow and draw surrounding games
+			for(i = (current_animation_selected - 1); i <= (current_animation_selected + 1); i++) {				
+				lcd_write_string_8pts(2 + (i - (current_animation_selected - 1))*2, GAMETABLE_ANIMATIONS[i].name);
+			}
+			
+			lcd_write_arrow(1);
+		}
+		
+	}
+	
+	lcd_push_buffer();
+}
+
 void init_lcd_menu(void)
 {
 	int i;
@@ -178,11 +331,4 @@ void init_lcd_menu(void)
 	init_lcd_menu_spi();
 	init_lcd_menu_dma();
 	init_lcd_menu_commands();
-	
-	while(lcd_pushing_init)
-		; // Wait for init to finish
-		
-	lcd_draw_top_bar(Image_LCD_GameSelect);
-		
-	lcd_push_buffer();
 }

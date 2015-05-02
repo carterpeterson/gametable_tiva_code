@@ -29,11 +29,16 @@ void task_snake_game(void *pvParameters);
 void task_bloom(void *pvParameters);
 
 
-#define NUM_GAMETABLE_GAMES			1
+#define NUM_GAMETABLE_GAMES				6
 #define NUM_GAMETABLE_ANIMATIONS	1
 
 const static GameTableTask GAMETABLE_GAMES[] = {
-	{task_snake_game , "Snake"}
+	{task_snake_game , "Snake"},
+	{task_snake_game , "Snake2"},
+	{task_snake_game , "Snake3"},
+	{task_snake_game , "Snake4"},
+	{task_snake_game , "Snake5"},
+	{task_snake_game , "Snake6"}
 };
 
 const static GameTableTask GAMETABLE_ANIMATIONS[] = {

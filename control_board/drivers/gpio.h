@@ -145,4 +145,6 @@ bool gpio_open_drain_disable(GPIOA_Type *port, uint8_t pins);
 */
 void gpio_config_port_ctl(GPIOA_Type *port, uint8_t pins, uint8_t pctl);
 
+void gpio_pull_up_enable(GPIOA_Type *port, uint8_t pins);
+
 #endif

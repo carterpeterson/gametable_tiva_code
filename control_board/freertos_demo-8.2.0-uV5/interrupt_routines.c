@@ -82,6 +82,44 @@
 	#endif
 	
 #else
+		
+	void GPIOA_Handler(void)
+	{
+		uint8_t status = PORT_A->RIS;
+		if((status & BUTTON_CENTER) == BUTTON_CENTER) {
+			center_pressed = true;
+		} else if ((status & BUTTON_LEFT) == BUTTON_LEFT) {
+			left_pressed = true;
+		}
+		
+		PORT_A->ICR |= (BUTTON_LEFT | BUTTON_CENTER);
+		xTaskResumeFromISR(hypervisor_task);
+	}
+	
+	void GPIOC_Handler(void)
+	{
+		uint8_t status = PORT_C->RIS;
+		if((status & BUTTON_DOWN) == BUTTON_DOWN) {
+			down_pressed = true;
+		} else if ((status & BUTTON_UP) == BUTTON_UP) {
+			up_pressed = true;
+		}
+		
+		PORT_C->ICR |= (BUTTON_DOWN | BUTTON_UP);
+		xTaskResumeFromISR(hypervisor_task);
+	}
+	
+	void GPIOE_Handler(void)
+	{
+		uint8_t status = PORT_E->RIS;
+		if((status & BUTTON_RIGHT) == BUTTON_RIGHT) {
+			right_pressed = true;
+		} 
+		
+		PORT_E->ICR |= BUTTON_RIGHT;
+		xTaskResumeFromISR(hypervisor_task);
+	}
+		
 	void HardFault_Handler(void)
 	{
 		while(1) {
