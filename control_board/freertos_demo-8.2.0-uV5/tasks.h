@@ -15,7 +15,30 @@
 
 #define TICK_DELAY_30_FPS		33
 
-//void task_pacman_animation(void *pvParameters);
+typedef void (*FreeRTOSTaskFunc)(void *pvParameters);
+
+typedef struct {
+	FreeRTOSTaskFunc task_function;
+	char* name;
+} GameTableTask;
+
+// Gametable animation declarations
 void task_snake_game(void *pvParameters);
+
+// Gametable game declarations
+void task_bloom(void *pvParameters);
+
+
+#define NUM_GAMETABLE_GAMES			1
+#define NUM_GAMETABLE_ANIMATIONS	1
+
+const static GameTableTask GAMETABLE_GAMES[] = {
+	{task_snake_game , "Snake"}
+};
+
+const static GameTableTask GAMETABLE_ANIMATIONS[] = {
+	{task_bloom , "Bloom"}
+};
+
 
 #endif

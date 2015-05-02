@@ -33,9 +33,8 @@ void spi_set_clock_speed(SSI0_Type *spi, uint8_t source)
 {
 	switch(source) {
 	case SPI_CLOCK_SPEED_20_MHZ:
-		spi->CPSR = 2;
+		spi->CPSR = 3;
 		spi->CR0 &= ~(0xFF << 8);
-		spi->CR0 |= (0x02 << 8);
 	break;
 	default:
 		// Do nothing

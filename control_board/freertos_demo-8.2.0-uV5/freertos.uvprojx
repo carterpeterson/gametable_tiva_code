@@ -429,6 +429,11 @@
               <FilePath>.\interrupt_routines.c</FilePath>
             </File>
             <File>
+              <FileName>lcd_graphics.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\lcd_graphics.h</FilePath>
+            </File>
+            <File>
               <FileName>lcd_menu.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\lcd_menu.h</FilePath>
@@ -589,6 +594,16 @@
           <GroupName>tasks</GroupName>
           <Files>
             <File>
+              <FileName>bloom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\bloom.h</FilePath>
+            </File>
+            <File>
+              <FileName>bloom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\bloom.c</FilePath>
+            </File>
+            <File>
               <FileName>hypervisor.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\hypervisor.h</FilePath>
@@ -599,16 +614,6 @@
               <FilePath>.\hypervisor.c</FilePath>
             </File>
             <File>
-              <FileName>tasks.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\tasks.h</FilePath>
-            </File>
-            <File>
-              <FileName>bloom.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\bloom.c</FilePath>
-            </File>
-            <File>
               <FileName>snake.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\snake.h</FilePath>
@@ -617,6 +622,11 @@
               <FileName>snake.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\snake.c</FilePath>
+            </File>
+            <File>
+              <FileName>tasks.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\tasks.h</FilePath>
             </File>
           </Files>
         </Group>

@@ -12,10 +12,7 @@
 #include "led_display.h"
 #include "touch_input.h"
 
-
 #define BLOOM_RADIUS 3
 #define FULL_RADIUS_STEP 100
-
-void task_bloom(void *pvParameters);
 
 #endif

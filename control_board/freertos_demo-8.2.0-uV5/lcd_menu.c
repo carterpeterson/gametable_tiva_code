@@ -1,20 +1,30 @@
 #include "lcd_menu.h"
 
-bool pushing_lcd_menu = false;
+bool lcd_pushing_menu = false;
+bool lcd_pushing_init = false;
+bool displaying_games = true;
+uint8_t lcd_current_page = 0;
+
+uint8_t lcd_buffers[2][102*8];
+uint8_t *lcd_buffer_read, *lcd_buffer_write;
+
 static uint8_t lcd_init_commands[] = 
 	{0x40,
 	0xA1,
-	0xC0,
+	0xC8,
 	0xA4,
 	0xA6,
 	0xA2,
 	0x2F,
 	0x27,
 	0x81,
-	0x10,
+	0x0A,
 	0xFA,
 	0x90,
-	0xAF};	// This is just their example setup from the EADOGS datasheet
+	0xAF,
+	0xB0,
+	0x00,
+	0x10};	// This is just their example setup from the EADOGS datasheet
 
 void init_lcd_menu_gpio(void)
 {
@@ -40,7 +50,7 @@ void init_lcd_menu_spi(void)
 	spi_set_clock_source(LCD_SPI, SPI_CLK_SRC_SYS);
 	spi_set_clock_speed(LCD_SPI, SPI_CLOCK_SPEED_20_MHZ);
 	spi_set_frame_format(LCD_SPI, SPI_FRF_FREESCALE);
-	spi_set_clock_polarity(LCD_SPI, SPI_POLARITY_HIGH);
+	spi_set_clock_polarity(LCD_SPI, SPI_POLARITY_LOW);
 	spi_set_clock_phase(LCD_SPI, SPI_PHASE_FIRST_CLK);
 	spi_set_data_size(LCD_SPI, 8);
 	spi_config_dma(LCD_SPI, SPI_DMACTL_TX_EN);
@@ -62,35 +72,117 @@ void init_lcd_menu_dma(void)
 void init_lcd_menu_commands(void)
 {
 	DMA_control lcd_setup_req;
-	set_lcd_command_mode();
+	lcd_set_command_mode();
 
-	lcd_setup_req.source = (void*) &(lcd_init_commands[12]);
+	lcd_setup_req.source = (void*) &(lcd_init_commands[15]);
 	lcd_setup_req.destination = (void*) &(LCD_SPI->DR);
 	lcd_setup_req.control = (DMA_DSTINC_NONE | \
 	DMA_DSTSIZE_BYTE | DMA_SRCINC_BYTE | DMA_SRCSIZE_BYTE | \
-	DMA_ARBSIZE_1 | (12U << 4) | DMA_XFERMODE_BASIC);
+	DMA_ARBSIZE_1 | (15U << 4) | DMA_XFERMODE_BASIC);
 		
 	dma_primary_control_structure_set(LCD_DMA_CHANNEL, &lcd_setup_req);	
-		
-	dma_channel_enable(LCD_DMA_CHANNEL);
 	
-	set_lcd_data_mode();
+	lcd_pushing_init = true;
+	dma_channel_enable(LCD_DMA_CHANNEL);
 }
 
-void set_lcd_command_mode(void)
+void lcd_set_command_mode(void)
 {
 	LCD_PORT->DATA &= ~LCD_CD_PIN;
 }
 
-void set_lcd_data_mode(void)
+void lcd_set_data_mode(void)
 {
 	LCD_PORT->DATA |= LCD_CD_PIN;
 }
 
+void lcd_set_page(uint8_t page)
+{
+	lcd_set_command_mode();
+	LCD_SPI->DR = (0xB0 | page);
+}
+
+void lcd_set_column(uint8_t column)
+{
+	lcd_set_command_mode();
+	LCD_SPI->DR = (0x00 | (column & 0x0F));
+	LCD_SPI->DR = (0x10 | ((column & 0xF0) >> 4));
+}
+
+void lcd_push_buffer(void)
+{
+	DMA_control lcd_push_req;
+	uint8_t *temp;
+	
+	if(lcd_pushing_menu | lcd_pushing_init)
+		return;	// Already pushing a menu out, don't interrupt
+	
+	temp = lcd_buffer_read;
+	lcd_buffer_read = lcd_buffer_write;
+	lcd_buffer_write = temp;
+	
+	lcd_current_page = 0;
+	lcd_set_page(lcd_current_page);
+	lcd_set_column(0);
+	
+	while((LCD_SPI->SR & 0x01) != 0x01)
+		; // Wait for commands to send
+		
+	lcd_set_data_mode();
+	
+	lcd_push_req.source = (void*) &(lcd_buffer_read[LCD_ROW_SIZE_MINUS_ONE]);
+	lcd_push_req.destination = (void*) &(LCD_SPI->DR);
+	lcd_push_req.control = (DMA_DSTINC_NONE | \
+	DMA_DSTSIZE_BYTE | DMA_SRCINC_BYTE | DMA_SRCSIZE_BYTE | \
+	DMA_ARBSIZE_1 | (LCD_ROW_SIZE_MINUS_ONE << 4) | DMA_XFERMODE_BASIC);
+		
+	dma_primary_control_structure_set(LCD_DMA_CHANNEL, &lcd_push_req);	
+	
+	lcd_pushing_menu = true;
+	dma_channel_enable(LCD_DMA_CHANNEL);
+}
+
+void init_lcd_buffers(void)
+{
+	int i;
+	lcd_buffer_read = lcd_buffers[0];
+	lcd_buffer_write = lcd_buffers[1];
+	
+	for(i = 0; i < 102 * 8; i++) {
+		lcd_buffer_write[i] = 0x00;
+		lcd_buffer_read[i] = 0x00;
+	}
+}
+
+void lcd_set_buffer_byte(uint8_t page, uint8_t column, uint8_t byte)
+{
+	lcd_buffer_write[page * LCD_ROW_SIZE + (LCD_ROW_SIZE_MINUS_ONE - column)] = byte;
+}
+
+void lcd_draw_top_bar(const uint8_t img[]){
+	int i, j;
+
+	for(i = 0; i < 2; i++) {
+		for(j=0; j<102; j++) {
+			lcd_set_buffer_byte(i, j, img[i*102 + j]);
+		}
+	}
+}
+
 void init_lcd_menu(void)
 {
+	int i;
+
+	init_lcd_buffers();
 	init_lcd_menu_gpio();
 	init_lcd_menu_spi();
 	init_lcd_menu_dma();
 	init_lcd_menu_commands();
+	
+	while(lcd_pushing_init)
+		; // Wait for init to finish
+		
+	lcd_draw_top_bar(Image_LCD_GameSelect);
+		
+	lcd_push_buffer();
 }

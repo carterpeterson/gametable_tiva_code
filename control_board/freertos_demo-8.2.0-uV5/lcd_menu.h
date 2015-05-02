@@ -17,6 +17,7 @@
 #include "../drivers/gpio.h"
 #include "../drivers/spi.h"
 #include "../drivers/dma.h"
+#include "lcd_graphics.h"
 
 #define LCD_SPI			SSI0
 #define LCD_PORT		PORT_A
@@ -28,10 +29,17 @@
 
 #define LCD_DMA_CHANNEL	11
 
-extern bool pushing_lcd_menu;
+#define LCD_ROW_SIZE_MINUS_ONE	101
+#define LCD_ROW_SIZE			102
+
+extern bool lcd_pushing_menu, lcd_pushing_init;
+extern uint8_t lcd_current_page;
+extern uint8_t *lcd_buffer_read, *lcd_buffer_write;
 
 void init_lcd_menu(void);
-void set_lcd_command_mode(void);
-void set_lcd_data_mode(void);
+void lcd_set_command_mode(void);
+void lcd_set_data_mode(void);
+void lcd_set_page(uint8_t page);
+void lcd_set_column(uint8_t column);
 
 #endif
