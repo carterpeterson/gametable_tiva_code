@@ -1,13 +1,18 @@
 #ifndef __PONG_H__
 #define __PONG_H__
 
+// General C includes
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
+
+// FreeRTOS includes
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
 
+// Project specific includes
 #include "tasks.h"
 #include "led_display.h"
 #include "touch_input.h"
@@ -20,15 +25,15 @@
 #define HOLDX 0
 #define RIGHT 1
 
-#define BALL -1
+#define BLANKSPACE -1
 #define BALLTAIL -2
 #define LPAD 1
 #define RPAD 2
-#define BLANKSPACE 0
+#define BALL 0
 
 #define GRIDX 32
 #define GRIDY 8
 
-void task_pong_game(void *pvParameters);
+#define BALL_SPEED_TICKS 100
 
 #endif

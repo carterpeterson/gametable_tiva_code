@@ -28,7 +28,7 @@ Pixel get_bloom_pixel(int i, int j)
   return p;
 }
 
-void task_bloom(void *pvParameters)
+void task_bloom_animation(void *pvParameters)
 {
 	int i, j, temp;
 	Pixel black_pixel;

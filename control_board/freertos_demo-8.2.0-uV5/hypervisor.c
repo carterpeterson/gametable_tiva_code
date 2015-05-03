@@ -1,15 +1,14 @@
 #include "hypervisor.h"
 
 bool viewing_games = false;
-uint8_t current_game_selected = 3;
+uint8_t current_game_selected = 0;
 uint8_t current_animation_selected = 0;
-TaskHandle_t hypervisor_task;
+TaskHandle_t hypervisor_task, currently_running_task;
 
 void task_hypervisor(void *pvParameters)
 {
 	BaseType_t return_val;
 	TickType_t startup_time;
-	TaskHandle_t created_task;
 	
 	startup_time = xTaskGetTickCount();
 	
@@ -18,18 +17,37 @@ void task_hypervisor(void *pvParameters)
 	lcd_update();
 	
 	return_val = xTaskCreate(
-                              task_snake_game,                            	// Function Pointer
-                              (signed portCHAR *)"snake",           		// Task Name
-                              TASK_STACK_SIZE,                  		// Stack Depth in Words
-                              NULL,                                   	// Parameters to Function (games and animations have none)
-                              tskIDLE_PRIORITY + PRIORITY_ANIMATION,  	// Task Priority
-                              &created_task);                                  	// Task Handle
+                              GAMETABLE_ANIMATIONS[0].task_function,                            	// Function Pointer
+                              (signed portCHAR *)GAMETABLE_ANIMATIONS[0].name,           			// Task Name
+                              TASK_STACK_SIZE,                  									// Stack Depth in Words
+                              NULL,                                   								// Parameters to Function (games and animations have none)
+                              tskIDLE_PRIORITY + PRIORITY_ANIMATION,  								// Task Priority
+                              &currently_running_task);                                  			// Task Handle
 
 	while(1) {
 		vTaskSuspend(NULL);
 	
 		if(center_pressed) {
 			// change task
+			vTaskDelete(currently_running_task);
+			
+			if(viewing_games) {
+				xTaskCreate(
+						GAMETABLE_GAMES[current_game_selected].task_function,                            	// Function Pointer
+                        (signed portCHAR *)GAMETABLE_GAMES[current_game_selected].name,           			// Task Name
+                        TASK_STACK_SIZE,                  													// Stack Depth in Words
+                        NULL,                                   											// Parameters to Function (games and animations have none)
+                        tskIDLE_PRIORITY + PRIORITY_GAME,  													// Task Priority
+                        &currently_running_task);       
+			} else {
+				xTaskCreate(
+						GAMETABLE_ANIMATIONS[current_animation_selected].task_function,                     // Function Pointer
+                        (signed portCHAR *)GAMETABLE_ANIMATIONS[current_animation_selected].name,           // Task Name
+                        TASK_STACK_SIZE,                  													// Stack Depth in Words
+                        NULL,                                   											// Parameters to Function (games and animations have none)
+                        tskIDLE_PRIORITY + PRIORITY_ANIMATION,  											// Task Priority
+                        &currently_running_task);
+			}
 		} else if(left_pressed) {
 			viewing_games = !viewing_games;
 		} else if(up_pressed) {

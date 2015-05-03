@@ -19,7 +19,7 @@
 
 bool init_hypervisor_task(void);
 
-extern TaskHandle_t hypervisor_task;
+extern TaskHandle_t hypervisor_task, currently_running_task;
 extern bool viewing_games;
 extern uint8_t current_game_selected, current_animation_selected;
 

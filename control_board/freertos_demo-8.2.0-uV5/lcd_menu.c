@@ -175,7 +175,7 @@ void lcd_write_char_8pts(uint8_t page, char c, uint8_t col_start)
 	int actCol;
 	
 	//get index of character
-  int index = (c - 32)*18;
+	int index = (c - 97)*18;
 
 	actCol = col_start;
 	

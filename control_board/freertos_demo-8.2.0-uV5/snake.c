@@ -31,10 +31,14 @@ bool gameOver;
 Pixel green_pixel;
 Pixel red_pixel;
 Pixel blank_pixel;
+Pixel blue_pixel;
 int curr;
 
+void updateFrameBuffer(void);
 
 void initGame(void){
+
+  int i, j;
 	//initialize game variables
 	headX = 2;
 	headY = 2;
@@ -44,6 +48,14 @@ void initGame(void){
 	fruitX = 5;
 	fruitY = 5;
 	snakeLength = 2;
+	bufferUpdates = 0;
+ 
+   for(i = 0; i < GRIDX; i++){
+     for(j = 0; j < GRIDY; j++){
+       snakeMat[i][j] = BLANKSPACE;
+     }
+   }
+ 
 	snakeMat[headX][headY] = snakeLength;
 	snakeMat[tailX][tailY] = UP;
 	snakeMat[fruitX][fruitY] = FRUIT;
@@ -62,15 +74,52 @@ void initGame(void){
 	blank_pixel.red = 0;
     blank_pixel.green = 0;
     blank_pixel.blue = 0;
+    
+    blue_pixel.red = 0;
+    blue_pixel.green = 0;
+    blue_pixel.blue = 255;
 }
 
-void endGame(int score){
-    gameOver = true;
+void endGame(){
+	int x, y;
+  
+  while(1){
+  
+   for(x = 0; x < 32; x++){
+     for(y = 0; y < 8; y++){
+        if((x == 2 || x == 3) && (y == 3 || y == 4)){
+            frame_buffer[x + y*32] = green_pixel;
+        }
+        else if(((x == 22) && (y == 3)) ||
+        ((x == 22) && (y == 4)) ||
+        ((x == 21) && (y == 2)) ||
+        ((x == 21) && (y == 5)) ||
+        ((x == 24) && (y == 2)) ||
+        ((x == 20) && (y == 1)) ||
+        ((x == 20) && (y == 6)) ||
+        ((x == 24) && (y == 5))){
+               frame_buffer[x + y*32] = blue_pixel;
+        }
+        else{
+            frame_buffer[x + y*32] = red_pixel;
+        }
+     }
+   }
+
+    for(x = 2; x <= 3; x++){
+      for(y = 3; y <= 4; y++){
+        if(is_pixel_touched(x,y)){
+          return;
+        }
+      }
+    }
+    render();
+    //updateFrameBuffer();
+  }
 }
 
-void moveSnake(void){
+int moveSnake(void){
 	int dir, r;
-	int randVals[] = {84, 27, 183, 101, 78, 200, 8, 93, 138, 55, 220, 7};
 	dir = direction;
 	
 	//curr = 0;
@@ -114,7 +163,6 @@ void moveSnake(void){
 				fruitX = r/GRIDY;
 				fruitY = r % GRIDY;
 				curr++;
-				//printf("%d, %d \n", fruitX, fruitY);
 			}while(snakeMat[fruitX][fruitY] != 0);
 			snakeMat[fruitX][fruitY] = FRUIT;
 			
@@ -126,7 +174,7 @@ void moveSnake(void){
 		//uartTxPoll(UART0,"Game Over!");
 		//set game over and call end game loop
 		gameOver = true;
-		endGame(snakeLength);
+        return 1;
 	}
 	else{
 		//otherwise move the tail
@@ -146,7 +194,8 @@ void moveSnake(void){
 				break;
 		}
 
-	}	
+	}
+   return 0;
 }
 
 void examineButtons(void)
@@ -161,19 +210,19 @@ void examineButtons(void)
 		    //printf("LEFT");
 			direction = LEFT;
 		}
-		if((is_pixel_touched(0,6) || is_pixel_touched(1,6) ||
+		else if((is_pixel_touched(0,6) || is_pixel_touched(1,6) ||
 		    is_pixel_touched(0,7) || is_pixel_touched(1,7))&& direction != DOWN) {
 			//uartTxPoll(UART0, "SW301 Button Pushed\n\r");
 			//printf("up");
 			direction = UP;
 		}
-		if((is_pixel_touched(0,4) || is_pixel_touched(1,4) ||
+		else if((is_pixel_touched(0,4) || is_pixel_touched(1,4) ||
 		    is_pixel_touched(0,5) || is_pixel_touched(1,5))&& direction != LEFT) {
 			//uartTxPoll(UART0, "SW302 Button Pushed\n\r");
 		    //printf("RIGHT");
 			direction = RIGHT;			
 		}
-		if((is_pixel_touched(0,0) || is_pixel_touched(0,1) ||
+		else if((is_pixel_touched(0,0) || is_pixel_touched(0,1) ||
 		    is_pixel_touched(1,0) || is_pixel_touched(1,1))&& direction != UP) {
 			//uartTxPoll(UART0, "SW303 Button Pushed\n\r");
 			//printf("DOWN");
@@ -187,14 +236,11 @@ void examineButtons(void)
 void updateFrameBuffer(void){
 
     int x,y;
-	Pixel purp_pixel, blue_pixel, orange_pixel, yellow_pixel;
+    Pixel orange_pixel, yellow_pixel, purp_pixel;
     
     if(bufferUpdates <= 1){
     
-        blue_pixel.red = 0;
-        blue_pixel.green = 0;
-        blue_pixel.blue = 255;
-
+        
         orange_pixel.red = 225;
         orange_pixel.green = 153;
         orange_pixel.blue = 0;
@@ -203,7 +249,6 @@ void updateFrameBuffer(void){
         yellow_pixel.green = 255;
         yellow_pixel.blue = 0;
         
-
         purp_pixel.red = 204;
         purp_pixel.green = 0;
         purp_pixel.blue = 204;
@@ -249,23 +294,29 @@ void updateFrameBuffer(void){
 
 void task_snake_game(void *pvParameters)
 {
+    int score;
 	TickType_t curr_time, prev_time;
 
-	curr_time = xTaskGetTickCount();
-	prev_time = xTaskGetTickCount();
+    curr_time = xTaskGetTickCount();
+    prev_time = xTaskGetTickCount();    
 
+    
     initGame();
-	while(1) {
-		curr_time =  xTaskGetTickCount();
-
-		updateFrameBuffer();
-		examineButtons();
-		if((prev_time + SNAKE_SPEED_TICKS) < curr_time){
-			moveSnake();
-			prev_time = curr_time;
-		}
-
-		vTaskDelay(33);
-	}
+    while(1) {
+        curr_time = xTaskGetTickCount();
+    
+        updateFrameBuffer();
+        examineButtons();
+        if((prev_time + SNAKE_SPEED_TICKS) < curr_time){
+            if((moveSnake())){
+              endGame();
+              initGame();
+              
+              curr_time = xTaskGetTickCount();
+            }
+            prev_time = curr_time;
+        }
+		vTaskDelay(TICK_DELAY_30_FPS);
+    }
 }
 	

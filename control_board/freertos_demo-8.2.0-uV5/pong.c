@@ -1,5 +1,11 @@
 #include "pong.h"
 
+int moveBall(void);
+void initializeGame(void);
+void movePaddles(void);
+void updateScreen(void);
+
+
 //game matrix
 int pongGrid[GRIDX][GRIDY];
 
@@ -14,19 +20,12 @@ uint8_t rPadY;
 uint16_t lScore;
 uint16_t rScore;
 int ballDir[2];
-int next;
+extern int next;
 
-bool gameOver;
-
-Pixel green_pixel;
-Pixel red_pixel;
-Pixel blank_pixel;
-Pixel blue_pixel;
-        
-void moveBall(void);
-void initializeGame(void);
-void movePaddles(void);
-void updateScreen(void);
+extern Pixel green_pixel;
+extern Pixel red_pixel;
+extern Pixel blank_pixel;
+extern Pixel blue_pixel;
 
 void initializeGame(void){
 	//initialize game variables
@@ -50,8 +49,6 @@ void initializeGame(void){
 	pongGrid[GRIDX-1][rPadY] = RPAD;
     pongGrid[GRIDX-1][rPadY+1] = RPAD;
     pongGrid[GRIDX-1][rPadY-1] = RPAD;
-
-	gameOver = false;
 	
     red_pixel.red = 255;
     red_pixel.green = 0;
@@ -67,26 +64,22 @@ void initializeGame(void){
     
     blue_pixel.red = 0;
     blue_pixel.green = 0;
-    blue_pixel.blue = 255;    
+    blue_pixel.blue = 255;
+    
 }
 
-void launchBall(){
+void launchBall(bool hold){
 
     int x,y;
-    for(x = 0; x < GRIDX; x++){
-        for(y = 0; y < GRIDY; y++){
-            pongGrid[x][y] = BLANKSPACE;
-        }
-    }
 
 	ballX = GRIDX/2;
 	ballY = GRIDY/2;
-	pongGrid[ballX][0] = BALL;
-	
-	updateScreen();
+	pongGrid[ballX][ballY] = BALL;
 	
     while(1){
-        if(is_pixel_touched(ballX,ballY)){
+    	updateScreen();
+		vTaskDelay(1000);
+        if(is_pixel_touched(ballX,ballY) || !hold){
             int r = rand() % (4);
             switch(r){
                 case 0:
@@ -108,24 +101,50 @@ void launchBall(){
             }
             break;
         }
+		vTaskDelay(TICK_DELAY_30_FPS);
     }
     
 
 }
 
 void finishGame(int winner){
-    /*printf("Game Over\n");
-    printf("%d, %d\n", lScore, rScore);
-    if(winner == LPAD){
-        printf("Left Player Wins!\n");
+
+    int x, y; 
+    int counter = 0;
+    
+    for(x = 0; x < GRIDX; x++){
+        for(y = 0; y < GRIDY; y++){
+            pongGrid[x][y] = BLANKSPACE;
+        }
     }
-    else if(winner == RPAD){
-        printf("Right Player Wins!\n");    
-    }*/
-    gameOver = true;
+    
+    while(1){
+        for(x = 0; x < 10; x++){
+            for(y = 0; y < GRIDY; y++){
+                if(winner == LPAD){  
+                    pongGrid[x + 22][y] = (y + counter) % 3;
+                }
+                else{
+                    pongGrid[x][y] = (y + counter) % 3;
+                }
+            }
+        }
+        
+        ballX = GRIDX/2;
+	    ballY = GRIDY/2;
+	    pongGrid[ballX][ballY] = BALL;
+	    
+        updateScreen();
+        counter++;
+        vTaskDelay(50);
+        if(is_pixel_touched(ballX,ballY)){
+            return;
+        }
+       
+    }
 }
 
-void moveBall(void){	
+int moveBall(void){	
 	//set previous head spot with direction the head is about to travel
 	pongGrid[ballX][ballY] = BLANKSPACE;
 	
@@ -158,33 +177,33 @@ void moveBall(void){
 	    lScore++;
 
 	    if(lScore >= 10){
-	        finishGame(LPAD);
+            return LPAD;
 	    }
 	    else{
 	        updateScreen();
-	        launchBall();
+	        launchBall(false);
 	    }
-	    return;
 	}
 	else if(ballX + ballDir[0] >= GRIDX){
         rScore++;
 	    if(rScore >= 10){
-	        finishGame(RPAD);
+            return RPAD;
 	    }
 	    else{
-	        //printf("%d, %d\n", lScore, rScore);
 	        updateScreen();
-	        launchBall();
+	        launchBall(false);
 	    }
-	    return;
 	}
-	
+	return 0;
 }
 
 void movePaddles(void)
 {  
-	
+	bool foundL, foundR;
 	int i;
+	
+	foundL = false;
+	foundR = false;
 	
 	//if button has been pressed determine which has bee n pressed
 	//and set Direction var to appropriate value
@@ -194,7 +213,7 @@ void movePaddles(void)
     }
 
     for(i = 0; i < GRIDY; i++){
-        if(is_pixel_touched(0,i)){
+        if(is_pixel_touched(0,i) && !foundL){
             pongGrid[0][i] = LPAD;
             if(i+1<GRIDY){
                 pongGrid[0][i+1] = LPAD;
@@ -203,6 +222,7 @@ void movePaddles(void)
             if(i-1 >= 0){
                 pongGrid[0][i-1] = LPAD;
             }
+			foundL = true;
         }
         
         if(is_pixel_touched(GRIDX-1,i)){
@@ -214,6 +234,7 @@ void movePaddles(void)
             if(i-1 >= 0){
                 pongGrid[GRIDX-1][i-1] = RPAD;
             }
+			foundR = true;
         }
     }
 	
@@ -240,36 +261,38 @@ void updateScreen(void){
             }
         }
     }
+    
     render();
 }
 
 void task_pong_game(void *pvParameters)
 {
-	TickType_t curr_time, prev_time;
+    int game_state;
+    TickType_t curr_time, prev_time;
     
     initializeGame();
-    updateScreen();
-    launchBall();
-
+    launchBall(true);
+   
     curr_time = xTaskGetTickCount();
-	prev_time = xTaskGetTickCount();
+    prev_time = xTaskGetTickCount();
 
     while(1) {
-		curr_time = xTaskGetTickCount();
-		
-		updateScreen();
-		movePaddles();
-		
-		if((prev_time + 100) < curr_time){
-			moveBall();
-			if(gameOver){
-				break;
-			}
-			prev_time = curr_time;
-		}
-		updateScreen();
-		vTaskDelay(33);
-	
-  }
+        curr_time = xTaskGetTickCount();
+        updateScreen();
+        movePaddles();
+        if(prev_time + BALL_SPEED_TICKS < curr_time){
+            if((game_state = moveBall()) != 0){
+                finishGame(game_state);
+                initializeGame();
+                launchBall(true);
+                
+                curr_time = xTaskGetTickCount();
+                prev_time = xTaskGetTickCount();
+            }
+            prev_time = curr_time;
+        }
+        updateScreen();
+		vTaskDelay(TICK_DELAY_30_FPS);
+	}
 }
 	

@@ -22,27 +22,26 @@ typedef struct {
 	char* name;
 } GameTableTask;
 
-// Gametable animation declarations
-void task_snake_game(void *pvParameters);
-
 // Gametable game declarations
-void task_bloom(void *pvParameters);
+void task_snake_game(void *pvParameters);
+void task_pong_game(void *pvParameters);
+
+// Gametable animation declarations
+void task_bloom_animation(void *pvParameters);
+void task_plot_animation(void *pvParameters);
 
 
-#define NUM_GAMETABLE_GAMES				6
-#define NUM_GAMETABLE_ANIMATIONS	1
+#define NUM_GAMETABLE_GAMES				2
+#define NUM_GAMETABLE_ANIMATIONS		2
 
 const static GameTableTask GAMETABLE_GAMES[] = {
-	{task_snake_game , "Snake"},
-	{task_snake_game , "Snake2"},
-	{task_snake_game , "Snake3"},
-	{task_snake_game , "Snake4"},
-	{task_snake_game , "Snake5"},
-	{task_snake_game , "Snake6"}
+	{task_snake_game , "snake"},
+	{task_pong_game, "pong"}
 };
 
 const static GameTableTask GAMETABLE_ANIMATIONS[] = {
-	{task_bloom , "Bloom"}
+	{task_bloom_animation , "bloom"},
+	{task_plot_animation , "plot"},
 };
 
 
