@@ -40,5 +40,6 @@ extern bool pushing_frame;
 void render(void);
 void init_led_display(void);
 void set_pixel(int i, int j, Pixel p);
+void clear_frame_buffer(void);
 
 #endif

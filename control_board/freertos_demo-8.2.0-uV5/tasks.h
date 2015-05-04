@@ -29,6 +29,7 @@ void task_pong_game(void *pvParameters);
 // Gametable animation declarations
 void task_bloom_animation(void *pvParameters);
 void task_plot_animation(void *pvParameters);
+void task_scroll_animation(void *pvParameters);
 
 
 #define NUM_GAMETABLE_GAMES				2
@@ -42,6 +43,7 @@ const static GameTableTask GAMETABLE_GAMES[] = {
 const static GameTableTask GAMETABLE_ANIMATIONS[] = {
 	{task_bloom_animation , "bloom"},
 	{task_plot_animation , "plot"},
+	{task_scroll_animation, "scroll"}
 };
 
 

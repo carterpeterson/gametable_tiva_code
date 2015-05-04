@@ -31,6 +31,16 @@ void transfer_frame_buffer(void)
 	dma_channel_enable(FRAME_OUTPUT_DMA_CHANNEL);
 }
 
+void clear_frame_buffer(void)
+{
+	int i = 0;
+	for(; i < 256; i++) {
+		frame_buffer[i].red = 0;
+		frame_buffer[i].green = 0;
+		frame_buffer[i].blue = 0;
+	}
+}
+
 void render(void)
 {
 	Pixel* temp = frame_buffer;

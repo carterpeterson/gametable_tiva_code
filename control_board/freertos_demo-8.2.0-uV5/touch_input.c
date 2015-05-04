@@ -83,7 +83,7 @@ void init_touch_input_dma(void)
 		touch_input_top_rx_req.destination = (void*) (((uint32_t) &(touch_buffer_top_write[TOUCH_BUFFER_SIZE])) - 1);
 		touch_input_top_rx_req.control = (DMA_DSTINC_BYTE | \
 		DMA_DSTSIZE_BYTE | DMA_SRCINC_NONE | DMA_SRCSIZE_BYTE | \
-		DMA_ARBSIZE_2 | ((TOUCH_BUFFER_SIZE_BYTES - 1) << 4) | DMA_XFERMODE_BASIC);
+		DMA_ARBSIZE_2 | ((TOUCH_BUFFER_SIZE_BYTES) << 4) | DMA_XFERMODE_BASIC);
 		dma_primary_control_structure_set(TOUCH_INPUT_TOP_DMA_CHANNEL, &touch_input_top_rx_req);
 		
 		// UART 7 for the bottom half of the board
@@ -98,7 +98,7 @@ void init_touch_input_dma(void)
 		touch_input_bottom_rx_req.destination = (void*) (((uint32_t) &(touch_buffer_bottom_write[TOUCH_BUFFER_SIZE])) - 1);
 		touch_input_bottom_rx_req.control = (DMA_DSTINC_BYTE | \
 		DMA_DSTSIZE_BYTE | DMA_SRCINC_NONE | DMA_SRCSIZE_BYTE | \
-		DMA_ARBSIZE_2 | ((TOUCH_BUFFER_SIZE_BYTES - 1) << 4) | DMA_XFERMODE_BASIC);
+		DMA_ARBSIZE_2 | ((TOUCH_BUFFER_SIZE_BYTES) << 4) | DMA_XFERMODE_BASIC);
 		
 		dma_primary_control_structure_set(TOUCH_INPUT_BOTTOM_DMA_CHANNEL, &touch_input_bottom_rx_req);
 	#endif

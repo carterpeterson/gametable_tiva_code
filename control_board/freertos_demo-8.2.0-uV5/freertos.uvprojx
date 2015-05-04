@@ -347,7 +347,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
+            <Optim>4</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>0</OneElfS>
@@ -414,11 +414,6 @@
               <FilePath>.\app_config.h</FilePath>
             </File>
             <File>
-              <FileName>touch_input.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\touch_input.c</FilePath>
-            </File>
-            <File>
               <FileName>freertos_demo.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\freertos_demo.c</FilePath>
@@ -464,6 +459,11 @@
               <FilePath>.\touch_input.h</FilePath>
             </File>
             <File>
+              <FileName>touch_input.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\touch_input.c</FilePath>
+            </File>
+            <File>
               <FileName>button_input.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\button_input.c</FilePath>
@@ -472,6 +472,11 @@
               <FileName>button_input.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\button_input.h</FilePath>
+            </File>
+            <File>
+              <FileName>FreeRTOSConfig.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\FreeRTOSConfig.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -604,6 +609,11 @@
           <GroupName>tasks</GroupName>
           <Files>
             <File>
+              <FileName>tasks.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\tasks.h</FilePath>
+            </File>
+            <File>
               <FileName>bloom.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\bloom.h</FilePath>
@@ -644,6 +654,16 @@
               <FilePath>.\pong.c</FilePath>
             </File>
             <File>
+              <FileName>scroll.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\scroll.h</FilePath>
+            </File>
+            <File>
+              <FileName>scroll.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\scroll.c</FilePath>
+            </File>
+            <File>
               <FileName>snake.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\snake.h</FilePath>
@@ -652,11 +672,6 @@
               <FileName>snake.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\snake.c</FilePath>
-            </File>
-            <File>
-              <FileName>tasks.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\tasks.h</FilePath>
             </File>
           </Files>
         </Group>
