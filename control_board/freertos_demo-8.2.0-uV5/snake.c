@@ -114,6 +114,7 @@ void endGame(){
       }
     }
     render();
+	vTaskDelay(TICK_DELAY_30_FPS);
     //updateFrameBuffer();
   }
 }

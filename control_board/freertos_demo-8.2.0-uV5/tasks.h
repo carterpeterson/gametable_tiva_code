@@ -30,10 +30,11 @@ void task_pong_game(void *pvParameters);
 void task_bloom_animation(void *pvParameters);
 void task_plot_animation(void *pvParameters);
 void task_scroll_animation(void *pvParameters);
+void task_eyes_animation(void *pvParameters);
 
 
 #define NUM_GAMETABLE_GAMES				2
-#define NUM_GAMETABLE_ANIMATIONS		2
+#define NUM_GAMETABLE_ANIMATIONS		4
 
 const static GameTableTask GAMETABLE_GAMES[] = {
 	{task_snake_game , "snake"},
@@ -41,6 +42,7 @@ const static GameTableTask GAMETABLE_GAMES[] = {
 };
 
 const static GameTableTask GAMETABLE_ANIMATIONS[] = {
+	{task_eyes_animation, "eyes"},
 	{task_bloom_animation , "bloom"},
 	{task_plot_animation , "plot"},
 	{task_scroll_animation, "scroll"}

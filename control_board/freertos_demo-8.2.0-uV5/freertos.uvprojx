@@ -614,6 +614,11 @@
               <FilePath>.\tasks.h</FilePath>
             </File>
             <File>
+              <FileName>blinking_eyes.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\blinking_eyes.c</FilePath>
+            </File>
+            <File>
               <FileName>bloom.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\bloom.h</FilePath>
@@ -672,6 +677,16 @@
               <FileName>snake.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\snake.c</FilePath>
+            </File>
+            <File>
+              <FileName>lookup_table.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\lookup_table.h</FilePath>
+            </File>
+            <File>
+              <FileName>task_bluetooth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\task_bluetooth.c</FilePath>
             </File>
           </Files>
         </Group>

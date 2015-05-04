@@ -1,26 +1,26 @@
 #include "scroll.h"
 
-void draw_letter(LetterMap *letter, uint8_t x_pos, Pixel fill)
+void draw_letter(LetterMap *letter, int x_pos, Pixel fill)
 {
-	int i, j;
-	
-	for(i = 0; i < letter->width; i++) {
-		if(i < 0)
-			continue;
-	
-		if(i + x_pos >= PIXELS_WIDTH)
-			return;
-	
-		for(j = 0; j < LETTER_HEIGHT; j++) {
-			if((letter->map[i] & (0x01 << (7 - j))) != 0)
-				frame_buffer[(j * PIXELS_WIDTH) + (i + x_pos)] = fill;
-		}
-	}
+  int i, j;
+  
+  for(i = 0; i < letter->width; i++) {
+    if(i + x_pos < 0)
+      continue;
+    
+    if(i + x_pos >= PIXELS_WIDTH)
+      return;
+    
+    for(j = 0; j < LETTER_HEIGHT; j++) {
+      if((letter->map[i] & (0x01 << (7 - j))) != 0)
+		frame_buffer[(j * PIXELS_WIDTH) + (i + x_pos)] = fill;
+    }
+  }
 }
 
-void draw_string(char* string, uint8_t x_pos, Pixel fill)
+void draw_string(char* string, int x_pos, Pixel fill)
 {
-	uint8_t current_x_pos;
+	int current_x_pos;
 
 	clear_frame_buffer();
 	
@@ -34,14 +34,35 @@ void draw_string(char* string, uint8_t x_pos, Pixel fill)
 	render();
 }
 
+int string_width(char *string)
+{
+  int width = 0;
+  while(*string != '\0') {
+    width += letters[(uint8_t) (*string - ' ')].width;
+    string++;
+    if(*string != '\0')
+      width += 1;
+  }
+  return width;
+}
+
+void scroll_string(char* string, int step_delay_ms, Pixel fill)
+{
+  int current_x = 31;
+
+  while(current_x > -(string_width(string))) {
+    draw_string(string, current_x, fill);
+    current_x--;
+	vTaskDelay(step_delay_ms);
+  }
+}
+
 void task_scroll_animation(void *pvParameters)
 {
 	Pixel blue;
 	blue.blue = 255;
-
-	draw_string("Test!", 0, blue);
 	
 	while(1) {
-		vTaskDelay(TICK_DELAY_30_FPS);
+	  scroll_string("Tobias the Table! Sponsored by XES", (3 * TICK_DELAY_30_FPS), blue);
 	}
 }

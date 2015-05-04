@@ -123,4 +123,6 @@ LetterMap letters[] = {
 {'}', 2, {247, 8, 0, 0, 0, 0, 0}},
 {'~', 4, {32, 64, 32, 64, 0, 0, 0}}};
 
+void scroll_string(char* string, int step_delay_ms, Pixel fill);
+
 #endif

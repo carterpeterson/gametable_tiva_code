@@ -35,6 +35,7 @@
 #include "lcd_menu.h"
 #include "hypervisor.h"
 #include "button_input.h"
+#include "task_bluetooth.h"
 
 //*****************************************************************************
 //*****************************************************************************
@@ -46,6 +47,7 @@ int main(void)
 	init_lcd_menu();
 	
 	init_hypervisor_task();
+	BluetoothTaskInit();
 
 	//
 	// Start the scheduler.  This should not return.
