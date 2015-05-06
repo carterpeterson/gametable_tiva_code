@@ -34,6 +34,6 @@
 #define GRIDX 32
 #define GRIDY 8
 
-#define BALL_SPEED_TICKS 100
+#define BALL_SPEED_TICKS 125
 
 #endif

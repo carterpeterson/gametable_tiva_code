@@ -33,5 +33,7 @@
 
 void init_touch_input(void);
 bool is_pixel_touched(uint8_t i, uint8_t j);
+void add_byte_top(uint8_t byte);
+void add_byte_bottom(uint8_t byte);
 
 #endif

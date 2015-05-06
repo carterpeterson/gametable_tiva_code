@@ -225,7 +225,7 @@ void movePaddles(void)
 			foundL = true;
         }
         
-        if(is_pixel_touched(GRIDX-1,i)){
+        if(is_pixel_touched(GRIDX-1,i) && !foundR){
             pongGrid[GRIDX-1][i] = RPAD;
             if(i+1<GRIDY){
                 pongGrid[GRIDX-1][i+1] = RPAD;

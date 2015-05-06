@@ -201,35 +201,71 @@ int moveSnake(void){
 
 void examineButtons(void)
 {  
-	
-	//if button has been pressed determine which has bee n pressed
-	//and set Direction var to appropriate value
+	bool go_left, go_right, go_up, go_down;
+	uint8_t left, right, up, down;
+	go_left = true;
+	go_right = true;
+	go_up = true;
+	go_down = true;
+	left = 0;
+	right = 0;
+	up = 0;
+	down = 0;
 
-		if((is_pixel_touched(0,2) || is_pixel_touched(1,2) ||
-		    is_pixel_touched(0,3) || is_pixel_touched(1,3)) && direction != RIGHT) {
-			//uartTxPoll(UART0, "SW300 Button Pushed\n\r");
-		    //printf("LEFT");
-			direction = LEFT;
-		}
-		else if((is_pixel_touched(0,6) || is_pixel_touched(1,6) ||
-		    is_pixel_touched(0,7) || is_pixel_touched(1,7))&& direction != DOWN) {
-			//uartTxPoll(UART0, "SW301 Button Pushed\n\r");
-			//printf("up");
-			direction = UP;
-		}
-		else if((is_pixel_touched(0,4) || is_pixel_touched(1,4) ||
-		    is_pixel_touched(0,5) || is_pixel_touched(1,5))&& direction != LEFT) {
-			//uartTxPoll(UART0, "SW302 Button Pushed\n\r");
-		    //printf("RIGHT");
-			direction = RIGHT;			
-		}
-		else if((is_pixel_touched(0,0) || is_pixel_touched(0,1) ||
-		    is_pixel_touched(1,0) || is_pixel_touched(1,1))&& direction != UP) {
-			//uartTxPoll(UART0, "SW303 Button Pushed\n\r");
-			//printf("DOWN");
-			direction = DOWN;
-		}
-		//AlertDebounce = false;
+	if(is_pixel_touched(0,0))
+		down++;
+	if(is_pixel_touched(0,1))
+		down++;
+	if(is_pixel_touched(1,0))
+		down++;
+	if(is_pixel_touched(1,1))
+		down++;
+
+	if(is_pixel_touched(0,2))
+		right++;
+	if(is_pixel_touched(1,2))
+		right++;
+	if(is_pixel_touched(0,3))
+		right++;
+	if(is_pixel_touched(1,3))
+		right++;
+		
+	if(is_pixel_touched(0,4))
+		left++;
+	if(is_pixel_touched(1,4))
+		left++;
+	if(is_pixel_touched(0,5))
+		left++;
+	if(is_pixel_touched(1,5))
+		left++;
+		
+	if(is_pixel_touched(0,6))
+		up++;
+	if(is_pixel_touched(1,6))
+		up++;
+	if(is_pixel_touched(0,7))
+		up++;
+	if(is_pixel_touched(1,7))
+		up++;
+
+	if(direction == RIGHT || left < up || left < down || left < right)
+		go_left = false;
+	if(direction == LEFT || right < up || right < down || right < left)
+		go_right = false;		
+	if(direction == UP || down < up || down < right || down < left)
+		go_down = false;		
+	if(direction == DOWN || up < down || up < right || up < left)
+		go_up = false;		
+	
+	if(go_left)
+		direction = LEFT;
+	else if(go_down)
+		direction = DOWN;
+	else if(go_right)
+		direction = RIGHT;
+	else if(go_up)
+		direction = UP;
+	
 	
 	return;
 }

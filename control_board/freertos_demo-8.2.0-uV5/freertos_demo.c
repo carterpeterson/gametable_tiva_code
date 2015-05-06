@@ -41,13 +41,18 @@
 //*****************************************************************************
 int main(void)
 {
+	int i = 0;
+	for(; i < 1000000; i++) {
+		// wait for led board
+	}
+
 	init_led_display();
 	init_touch_input();
-	init_button_input();
-	init_lcd_menu();
+	//init_button_input();
+	//init_lcd_menu();
 	
 	init_hypervisor_task();
-	BluetoothTaskInit();
+	//BluetoothTaskInit();
 
 	//
 	// Start the scheduler.  This should not return.

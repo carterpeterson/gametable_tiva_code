@@ -2,7 +2,7 @@
 
 bool viewing_games = false;
 uint8_t current_game_selected = 0;
-uint8_t current_animation_selected = 0;
+uint8_t current_animation_selected = 4;
 TaskHandle_t hypervisor_task, currently_running_task;
 
 void task_hypervisor(void *pvParameters)
@@ -14,11 +14,11 @@ void task_hypervisor(void *pvParameters)
 	
 	vTaskDelayUntil(&startup_time, 1000);	// Let all the drivers settle down and whatnot
 	
-	lcd_update();
+	//lcd_update();
 	
 	return_val = xTaskCreate(
-                              GAMETABLE_ANIMATIONS[0].task_function,                            	// Function Pointer
-                              (signed portCHAR *)GAMETABLE_ANIMATIONS[0].name,           			// Task Name
+                              GAMETABLE_ANIMATIONS[current_animation_selected].task_function,                     // Function Pointer
+                        (signed portCHAR *)GAMETABLE_ANIMATIONS[current_animation_selected].name,           // Task Name
                               TASK_STACK_SIZE,                  									// Stack Depth in Words
                               NULL,                                   								// Parameters to Function (games and animations have none)
                               tskIDLE_PRIORITY + PRIORITY_ANIMATION,  								// Task Priority
@@ -81,7 +81,7 @@ void task_hypervisor(void *pvParameters)
 		right_pressed = false;
 		down_pressed = false;
 		
-		lcd_update();
+		//lcd_update();
 	}
 }
 

@@ -1,9 +1,12 @@
-#ifndef __SNAKE_H__
-#define __SNAKE_H__
+#ifndef __DRAWER_H__
+#define	__DRAWER_H__
 
 // General C includes
+#include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
+#include <stdbool.h>
 
 // FreeRTOS includes
 #include <stdbool.h>
@@ -17,17 +20,11 @@
 #include "tasks.h"
 #include "led_display.h"
 #include "touch_input.h"
+#include "mario_world.h"
 
-#define UP 1
-#define DOWN 3
-#define LEFT 4
-#define RIGHT 2
-#define FRUIT -1
-#define BLANKSPACE 0
+#define SCROLL_SPEED_MS			150
 
-#define GRIDX 8
-#define GRIDY 30
-
-#define SNAKE_SPEED_TICKS 250
+#define COLOR_CHANNELS_RGBA		4
+#define MARIO_WORLD_WIDTH		82
 
 #endif

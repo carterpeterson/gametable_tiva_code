@@ -7,6 +7,8 @@
 	uint32_t touch_buffers[2][2][4];
 	uint32_t *touch_buffer_top_read, *touch_buffer_bottom_read;
 	uint32_t *touch_buffer_top_write, *touch_buffer_bottom_write;
+	uint8_t current_byte_top, current_byte_bottom;
+	bool first_byte_top, first_byte_bottom;
 #endif
 
 void init_touch_buffers(void)
@@ -118,6 +120,7 @@ void init_touch_input_uart(void)
 		uart_config_line_control(UART6, (UART_CTL_WORD_LENGTH_8 | UART_LCRH_FEN));
 		uart_config_dma(UART6, UART_DMACTL_RX_EN);
 		uart_enable_interrupts(UART6, 2);
+		//UART6->IM |= 0x10;
 		UART6->IFLS &= (~0xF0);
 		UART6->IFLS |= 0x10;
 		uart_channel_enable(UART6, UART_CTL_ENABLE | UART_CTL_RX_ENABLE | UART_CTL_TX_ENABLE);
@@ -129,6 +132,7 @@ void init_touch_input_uart(void)
 		uart_config_line_control(UART7, (UART_CTL_WORD_LENGTH_8 | UART_LCRH_FEN));
 		uart_config_dma(UART7, UART_DMACTL_RX_EN);
 		uart_enable_interrupts(UART7, 2);
+		//UART7->IM |= 0x10;
 		UART7->IFLS &= (~0xF0);
 		UART7->IFLS |= 0x10;
 		uart_channel_enable(UART7, UART_CTL_ENABLE | UART_CTL_RX_ENABLE | UART_CTL_TX_ENABLE);
@@ -141,6 +145,58 @@ void init_touch_input(void)
 	init_touch_input_gpio();
 	init_touch_input_dma();
 	init_touch_input_uart();
+	/*first_byte_top = true;
+	current_byte_top = 0;
+	first_byte_bottom = true;
+	current_byte_bottom = 0;*/
+}
+
+void add_byte_top(uint8_t byte)
+{
+	uint32_t* temp;
+	uint8_t i;
+
+	if(first_byte_top) {
+		first_byte_top = false;
+		return;
+	}
+	
+	touch_buffer_top_write[(current_byte_top / 4)] |= (byte << (current_byte_top % 4));
+	current_byte_top++;
+	
+	if(current_byte_top == 16) {
+		temp = touch_buffer_top_read;
+		touch_buffer_top_read = touch_buffer_top_write;
+		touch_buffer_top_write = temp;
+		
+		for(i = 0; i < 4; i++) {
+			touch_buffer_top_write[i] = 0;
+		}
+	}
+}
+
+void add_byte_bottom(uint8_t byte)
+{
+	uint32_t* temp;
+	uint8_t i;
+
+	if(first_byte_bottom) {
+		first_byte_bottom = false;
+		return;
+	}
+	
+	touch_buffer_bottom_write[(current_byte_bottom / 4)] |= (byte << (current_byte_bottom % 4));
+	current_byte_bottom++;
+	
+	if(current_byte_bottom == 16) {
+		temp = touch_buffer_bottom_read;
+		touch_buffer_bottom_read = touch_buffer_bottom_write;
+		touch_buffer_bottom_write = temp;
+		
+		for(i = 0; i < 4; i++) {
+			touch_buffer_bottom_write[i] = 0;
+		}
+	}
 }
 
 bool is_pixel_touched(uint8_t i, uint8_t j)

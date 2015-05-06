@@ -36,7 +36,7 @@
 	#ifndef USING_SIMULATOR_TOUCH
 		void UART6_Handler(void)
 		{
-			DMA_control touch_input_rx_req;
+			/*DMA_control touch_input_rx_req;
 			uint32_t  status, *temp;
 			status = UDMA->CHIS;
 			
@@ -54,12 +54,17 @@
 				DMA_ARBSIZE_2 | ((TOUCH_BUFFER_SIZE_BYTES - 1) << 4) | DMA_XFERMODE_BASIC);
 				dma_primary_control_structure_set(TOUCH_INPUT_TOP_DMA_CHANNEL, &touch_input_rx_req);
 				dma_channel_enable(TOUCH_INPUT_TOP_DMA_CHANNEL);
-			//}
+			//}*/
+			uint8_t data;
+			while ((UART6->FR & 0x10) != 0x10) {
+				data = UART6->DR;
+				add_byte_top(data);
+			}
 		}
 		
 		void UART7_Handler(void)
 		{
-			DMA_control touch_input_rx_req;
+			/*DMA_control touch_input_rx_req;
 			uint32_t  status, *temp;
 			status = UDMA->CHIS;
 			
@@ -77,7 +82,13 @@
 				DMA_ARBSIZE_2 | ((TOUCH_BUFFER_SIZE_BYTES - 1) << 4) | DMA_XFERMODE_BASIC);
 				dma_primary_control_structure_set(TOUCH_INPUT_BOTTOM_DMA_CHANNEL, &touch_input_rx_req);
 				dma_channel_enable(TOUCH_INPUT_BOTTOM_DMA_CHANNEL);
-			//}
+			//}*/
+			
+			uint8_t data;
+			while ((UART7->FR & 0x10) != 0x10) {
+				data = UART7->DR;
+				add_byte_bottom(data);
+			}
 		}
 	#endif
 	
@@ -187,7 +198,7 @@
 		uint32_t  status, *temp;
 		status = UDMA->CHIS;
 		
-		if((status & (0x01 << TOUCH_INPUT_TOP_DMA_CHANNEL)) == (0x01 << TOUCH_INPUT_TOP_DMA_CHANNEL)){		
+		//if((status & (0x01 << TOUCH_INPUT_TOP_DMA_CHANNEL)) == (0x01 << TOUCH_INPUT_TOP_DMA_CHANNEL)){		
 			UDMA->CHIS |= (0x01 << TOUCH_INPUT_TOP_DMA_CHANNEL); // Clear
 
 			temp = touch_buffer_top_write;
@@ -201,7 +212,7 @@
 			DMA_ARBSIZE_2 | ((TOUCH_BUFFER_SIZE_BYTES - 1) << 4) | DMA_XFERMODE_BASIC);
 			dma_primary_control_structure_set(TOUCH_INPUT_TOP_DMA_CHANNEL, &touch_input_rx_req);
 			dma_channel_enable(TOUCH_INPUT_TOP_DMA_CHANNEL);
-		}
+		//}
 	}
 	
 	void UART7_Handler(void)
@@ -210,7 +221,7 @@
 		uint32_t  status, *temp;
 		status = UDMA->CHIS;
 		
-		if((status & (0x01 << TOUCH_INPUT_BOTTOM_DMA_CHANNEL)) == (0x01 << TOUCH_INPUT_BOTTOM_DMA_CHANNEL)){		
+		//if((status & (0x01 << TOUCH_INPUT_BOTTOM_DMA_CHANNEL)) == (0x01 << TOUCH_INPUT_BOTTOM_DMA_CHANNEL)){		
 			UDMA->CHIS |= (0x01 << TOUCH_INPUT_BOTTOM_DMA_CHANNEL); // Clear
 
 			temp = touch_buffer_bottom_write;
@@ -224,6 +235,6 @@
 			DMA_ARBSIZE_2 | ((TOUCH_BUFFER_SIZE_BYTES - 1) << 4) | DMA_XFERMODE_BASIC);
 			dma_primary_control_structure_set(TOUCH_INPUT_BOTTOM_DMA_CHANNEL, &touch_input_rx_req);
 			dma_channel_enable(TOUCH_INPUT_BOTTOM_DMA_CHANNEL);
-		}
+		//}
 	}
 #endif

@@ -21,7 +21,7 @@
 #include "led_display.h"
 #include "touch_input.h"
 
-#define ROTATION_SPEED 		1.5 // degrees per tick
+#define ROTATION_SPEED 		3.5 // degrees per tick
 #define SIZE_SCALE_X 		10
 #define SIZE_SCALE_Y 		4
 #define COLOR_SCALAR 		255
@@ -31,9 +31,9 @@
 
 #define COLOR_BASE 			0.75
 #define COLOR_RANGE 		0.1
-#define COLOR_SCROLL_SPEED 	0.1
+#define COLOR_SCROLL_SPEED 	0.3
 
-#define WOBBLE_X_SPEED 		0.8
+#define WOBBLE_X_SPEED 		1.4
 #define WOBBLE_Y_SPEED 		0
 #define BASE_POSITION_X 	16
 #define BASE_POSITION_Y 	4

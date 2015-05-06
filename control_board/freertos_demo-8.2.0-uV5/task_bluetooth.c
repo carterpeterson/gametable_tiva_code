@@ -42,63 +42,8 @@ xQueueHandle UartRxQueue;
 static void
 BluetoothTask(void *pvParameters)
 {
-    //portTickType ui32WakeTime;
-    char msg;
-    //uint32_t count = 0;
-
-    while(1)   {
-			msg = uartRxPoll(UART1_BASE,false);
-			switch(msg)		{
-				case 0:
-					break;
-				//Basic Buttons
-				case 'M':
-					center_pressed = true;
-					xTaskResumeFromISR(hypervisor_task);
-					break;
-				case 'U':
-					up_pressed = true;
-					xTaskResumeFromISR(hypervisor_task);
-					break;
-				case 'R':
-					right_pressed = true;
-					xTaskResumeFromISR(hypervisor_task);
-					break;
-				case 'D':
-					down_pressed = true;
-					xTaskResumeFromISR(hypervisor_task);
-					break;
-				case 'L':
-					left_pressed = true;
-					xTaskResumeFromISR(hypervisor_task);
-					break;
-				case 'S':
-					center_pressed = true;
-					xTaskResumeFromISR(hypervisor_task);
-					break;
-				//case '???' tochangeprogram=true; programid=(the ID for ???)
-
-				///////////////////////////////////////////////////////////////////
-				default:
-					break;
-			}
-			//Also add an appropriate delay here////////////////////////
-			
-			vTaskDelay(50);
-    }
-    
-}
-
-//*****************************************************************************
-//
-// Initializes the LED task.
-//
-//*****************************************************************************
-uint32_t
-BluetoothTaskInit(void)
-{
-    uint32_t count;
-    BaseType_t return_val;
+	uint32_t count;
+	char msg;
 	
     gpio_port_enable(PORT_C_CGC);
 	gpio_port_enable(PORT_F_CGC);
@@ -174,6 +119,103 @@ BluetoothTaskInit(void)
 	GPIOF->DATA |= (1<<2);
 	count = 0;
 
+    //portTickType ui32WakeTime;
+    //uint32_t count = 0;
+
+    while(1)   {
+			msg = uartRxPoll(UART1_BASE,false);
+			switch(msg)		{
+				case 0:
+					break;
+				//Basic Buttons
+				case 'M':
+					center_pressed = true;
+					xTaskResumeFromISR(hypervisor_task);
+					break;
+				case 'U':
+					up_pressed = true;
+					xTaskResumeFromISR(hypervisor_task);
+					break;
+				case 'R':
+					right_pressed = true;
+					xTaskResumeFromISR(hypervisor_task);
+					break;
+				case 'D':
+					down_pressed = true;
+					xTaskResumeFromISR(hypervisor_task);
+					break;
+				case 'L':
+					left_pressed = true;
+					xTaskResumeFromISR(hypervisor_task);
+					break;
+				case 'S':
+					center_pressed = true;
+					xTaskResumeFromISR(hypervisor_task);
+					break;
+				case 'N':
+					// snake
+					viewing_games = true;
+					current_game_selected = 0;
+					center_pressed = true;
+					xTaskResumeFromISR(hypervisor_task);
+					break;
+				case 'P':
+					// pong
+					viewing_games = true;
+					current_game_selected = 1;
+					center_pressed = true;
+					xTaskResumeFromISR(hypervisor_task);
+					break;
+				case 'B':
+					// bloom
+					viewing_games = false;
+					current_animation_selected = 1;
+					center_pressed = true;
+					xTaskResumeFromISR(hypervisor_task);
+					break;
+				case 'O':
+					// plot
+					viewing_games = false;
+					current_animation_selected = 2;
+					center_pressed = true;
+					xTaskResumeFromISR(hypervisor_task);
+					break;
+				case 'F':
+					// scroll
+					viewing_games = false;
+					current_animation_selected = 3;
+					center_pressed = true;
+					xTaskResumeFromISR(hypervisor_task);
+					break;
+				case 'E':
+					viewing_games = false;
+					current_animation_selected = 0;
+					center_pressed = true;
+					xTaskResumeFromISR(hypervisor_task);
+					break;
+				//case '???' tochangeprogram=true; programid=(the ID for ???)
+
+				///////////////////////////////////////////////////////////////////
+				default:
+					break;
+			}
+			//Also add an appropriate delay here////////////////////////
+			
+			vTaskDelay(50);
+    }
+    
+}
+
+//*****************************************************************************
+//
+// Initializes the LED task.
+//
+//*****************************************************************************
+uint32_t
+BluetoothTaskInit(void)
+{
+    BaseType_t return_val;
+	
     // Create the Bluetooth task.
     //
     return_val = xTaskCreate(
