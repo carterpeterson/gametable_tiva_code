@@ -149,49 +149,6 @@
 		}
 	}
 	
-	void SSI0_Handler(void)
-	{
-		uint32_t  status;
-		DMA_control lcd_push_req;
-		status = UDMA->CHIS;
-		
-		if((status & (0x01 << LCD_DMA_CHANNEL)) == (0x01 << LCD_DMA_CHANNEL)){		
-			UDMA->CHIS |= (0x01 << LCD_DMA_CHANNEL); // Clear
-										
-			while((LCD_SPI->SR & 0x01) != 0x01)
-				; // Wait for data to finish sending
-			
-			if(lcd_pushing_init) {
-			
-				lcd_pushing_init = false;
-			} else if(lcd_pushing_menu) {
-				if(lcd_current_page >= 7) {
-					lcd_pushing_menu = false;
-					return;
-				}
-				
-				lcd_current_page++;
-				lcd_set_page(lcd_current_page);
-				lcd_set_column(0);
-				
-				while((LCD_SPI->SR & 0x01) != 0x01)
-					; // Wait for commands to send
-					
-				lcd_set_data_mode();
-
-				lcd_push_req.source = (void*) &(lcd_buffer_read[(lcd_current_page * LCD_ROW_SIZE) + LCD_ROW_SIZE_MINUS_ONE]);
-				lcd_push_req.destination = (void*) &(LCD_SPI->DR);
-				lcd_push_req.control = (DMA_DSTINC_NONE | \
-				DMA_DSTSIZE_BYTE | DMA_SRCINC_BYTE | DMA_SRCSIZE_BYTE | \
-				DMA_ARBSIZE_1 | (LCD_ROW_SIZE_MINUS_ONE << 4) | DMA_XFERMODE_BASIC);
-
-				dma_primary_control_structure_set(LCD_DMA_CHANNEL, &lcd_push_req);	
-
-				dma_channel_enable(LCD_DMA_CHANNEL);
-			}
-		}
-	}
-	
 	void UART6_Handler(void)
 	{
 		DMA_control touch_input_rx_req;

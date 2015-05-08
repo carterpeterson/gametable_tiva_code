@@ -26,7 +26,27 @@ void draw_eyes(uint8_t eye_num)
 		current_eyes = (uint8_t *) &eye3[0][0][0];
 		break;
 	case 4:
-		current_eyes = (uint8_t *) &eye4[0][0][0];
+		p.blue = 255;
+		for(i = 0; i < 32; i++) {
+			for(j = 0; j < 8; j++) {
+				set_pixel(i, j, p);
+			}
+		}
+	
+		render();
+		return;
+		break;
+	case 5:
+		current_eyes = (uint8_t *) &eye1[0][0][0];
+		break;
+	case 6:
+		current_eyes = (uint8_t *) &look2[0][0][0];
+		break;
+	case 7:
+		current_eyes = (uint8_t *) &look3[0][0][0];
+		break;
+	case 8:
+		current_eyes = (uint8_t *) &look4[0][0][0];
 		break;
 	default:
 		break;
@@ -61,6 +81,25 @@ void blink_eyes(void){
 	vTaskDelay(133);
 	
 	draw_eyes(2);
+	vTaskDelay(133);
+	
+	draw_eyes(5);
+	vTaskDelay(133);
+	
+	draw_eyes(6);
+	vTaskDelay(133);
+	
+	draw_eyes(7);
+	vTaskDelay(133);
+	
+	draw_eyes(6);
+	vTaskDelay(133);
+	
+	draw_eyes(5);
+	vTaskDelay(133);
+	
+	draw_eyes(8);
+	vTaskDelay(133);
 }
 
 void task_eyes_animation(void *pvParameters)

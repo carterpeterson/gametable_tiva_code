@@ -342,9 +342,9 @@ void task_snake_game(void *pvParameters)
     while(1) {
         curr_time = xTaskGetTickCount();
     
-        updateFrameBuffer();
-        examineButtons();
         if((prev_time + SNAKE_SPEED_TICKS) < curr_time){
+		updateFrameBuffer();
+        examineButtons();
             if((moveSnake())){
               endGame();
               initGame();

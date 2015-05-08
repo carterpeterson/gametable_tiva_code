@@ -1,5 +1,5 @@
-#ifndef __DRAWER_H__
-#define	__DRAWER_H__
+#ifndef __DANCE_H__
+#define	__DANCE_H__
 
 // General C includes
 #include <stdint.h>
@@ -20,11 +20,7 @@
 #include "tasks.h"
 #include "led_display.h"
 #include "touch_input.h"
-#include "mario_world.h"
 
-#define SCROLL_SPEED_MS			150
-
-#define COLOR_CHANNELS_RGBA		3
-#define MARIO_WORLD_WIDTH		82
+#define DANCE_SPEED_MS			150
 
 #endif

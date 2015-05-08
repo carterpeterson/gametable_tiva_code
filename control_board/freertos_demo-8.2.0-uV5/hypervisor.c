@@ -1,8 +1,8 @@
 #include "hypervisor.h"
 
-bool viewing_games = false;
+bool viewing_games = true;
 uint8_t current_game_selected = 0;
-uint8_t current_animation_selected = 4;
+uint8_t current_animation_selected = 3;
 TaskHandle_t hypervisor_task, currently_running_task;
 
 void task_hypervisor(void *pvParameters)
@@ -17,8 +17,8 @@ void task_hypervisor(void *pvParameters)
 	//lcd_update();
 	
 	return_val = xTaskCreate(
-                              GAMETABLE_ANIMATIONS[current_animation_selected].task_function,                     // Function Pointer
-                        (signed portCHAR *)GAMETABLE_ANIMATIONS[current_animation_selected].name,           // Task Name
+                              GAMETABLE_GAMES[current_game_selected].task_function,                            	// Function Pointer
+                        (signed portCHAR *)GAMETABLE_GAMES[current_game_selected].name,        // Task Name
                               TASK_STACK_SIZE,                  									// Stack Depth in Words
                               NULL,                                   								// Parameters to Function (games and animations have none)
                               tskIDLE_PRIORITY + PRIORITY_ANIMATION,  								// Task Priority

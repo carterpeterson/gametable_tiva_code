@@ -52,7 +52,7 @@ int main(void)
 	//init_lcd_menu();
 	
 	init_hypervisor_task();
-	//BluetoothTaskInit();
+	BluetoothTaskInit();
 
 	//
 	// Start the scheduler.  This should not return.

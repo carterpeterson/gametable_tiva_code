@@ -347,7 +347,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>2</Optim>
+            <Optim>4</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>0</OneElfS>
@@ -429,21 +429,6 @@
               <FilePath>.\interrupt_routines.c</FilePath>
             </File>
             <File>
-              <FileName>lcd_graphics.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\lcd_graphics.h</FilePath>
-            </File>
-            <File>
-              <FileName>lcd_menu.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\lcd_menu.h</FilePath>
-            </File>
-            <File>
-              <FileName>lcd_menu.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\lcd_menu.c</FilePath>
-            </File>
-            <File>
               <FileName>led_display.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\led_display.h</FilePath>
@@ -483,11 +468,6 @@
         <Group>
           <GroupName>FreeRTOS</GroupName>
           <Files>
-            <File>
-              <FileName>croutine.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FreeRTOS-8.2.0\Source\croutine.c</FilePath>
-            </File>
             <File>
               <FileName>event_groups.c</FileName>
               <FileType>1</FileType>
@@ -702,6 +682,11 @@
               <FileName>mario_world.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\mario_world.h</FilePath>
+            </File>
+            <File>
+              <FileName>dance.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\dance.c</FilePath>
             </File>
           </Files>
         </Group>

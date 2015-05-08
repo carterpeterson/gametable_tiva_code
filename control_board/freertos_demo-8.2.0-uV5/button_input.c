@@ -15,8 +15,8 @@ void init_button_input_gpio(void)
 	gpio_pull_up_enable(PORT_A, (BUTTON_LEFT | BUTTON_CENTER));
 	// enable interrupts (lazy and dont want to make driver function)
 	PORT_A->IM |= (BUTTON_LEFT | BUTTON_CENTER);
-  NVIC_SetPriority(GPIOA_IRQn, 5);
-  NVIC_EnableIRQ(GPIOA_IRQn);
+	NVIC_SetPriority(GPIOA_IRQn, 5);
+	NVIC_EnableIRQ(GPIOA_IRQn);
 	
 	// enable up and down button
 	gpio_port_enable(PORT_C_CGC);
@@ -26,7 +26,7 @@ void init_button_input_gpio(void)
 	// enable interrupts (lazy and dont want to make driver function)
 	PORT_C->IM |= (BUTTON_UP | BUTTON_DOWN);
 	NVIC_SetPriority(GPIOC_IRQn, 5);
-  NVIC_EnableIRQ(GPIOC_IRQn);
+	NVIC_EnableIRQ(GPIOC_IRQn);
 	
 	// enable right button
 	gpio_port_enable(PORT_E_CGC);
@@ -36,8 +36,7 @@ void init_button_input_gpio(void)
 	// enable interrupts (lazy and dont want to make driver function)
 	PORT_E->IM |= BUTTON_RIGHT;
 	NVIC_SetPriority(GPIOE_IRQn, 5);
-  NVIC_EnableIRQ(GPIOE_IRQn);
-	
+	NVIC_EnableIRQ(GPIOE_IRQn);
 }
 
 void init_button_input(void)

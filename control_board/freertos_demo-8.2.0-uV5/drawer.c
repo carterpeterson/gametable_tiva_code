@@ -4,8 +4,6 @@ void draw_image_map(int image_width, int image_height, int x_pos, int y_pos, con
 {
 	int i, j;
 	Pixel p;
-	
-	clear_frame_buffer();
   
 	for(i = 0; i < image_width; i++) {
 		if(i + x_pos < 0)
@@ -28,15 +26,24 @@ void draw_image_map(int image_width, int image_height, int x_pos, int y_pos, con
 			set_pixel((i + x_pos), (j + y_pos), p);
 		}
 	}
-	
-	render();
 }
 
 void task_drawer(void *pvParameters)
 {
-	draw_image_map(8, 24, 0, -8, &MARIO_LEVEL_ONE[0][0][0]);
+	int current_x = 0;
 	
 	while(1) {
-		vTaskDelay(TICK_DELAY_30_FPS);
+		clear_frame_buffer();
+	
+		draw_image_map(138, 8, current_x, 0, &MARIO_LEVEL_ONE_1[0][0][0]);
+		draw_image_map(138, 8, current_x + 138, 0, &MARIO_LEVEL_ONE_1[0][0][0]);
+		
+		render();
+		
+		current_x--;
+		if(current_x + (138 + 32) < 32)
+			current_x = 0;
+			
+		vTaskDelay(150);
 	}
 }
